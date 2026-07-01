@@ -6,7 +6,7 @@
         <h5>Edit Employee</h5>
     </div>
     <div class="card-body">
-        <form action="{{ route('employees.update', $employee->id) }}" method="POST">
+        <form action="{{ route('employees.update', $employee->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             
@@ -101,6 +101,27 @@
                     @error('status')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="profile_image" class="form-label">Profile Image</label>
+                    <input type="file" name="profile_image" id="profile_image" 
+                           class="form-control @error('profile_image') is-invalid @enderror" 
+                           accept="image/*">
+                    <small class="text-muted">Supported: jpeg, png, jpg, gif (Max: 2MB)</small>
+                    @error('profile_image')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    
+                    @if($employee->profile_image)
+                        <div class="mt-2">
+                            <img src="{{ $employee->profile_image_url }}" 
+                                 alt="{{ $employee->first_name }}" 
+                                 width="80" height="80" 
+                                 style="border-radius: 50%; object-fit: cover;">
+                            <p class="text-muted small mt-1">Current Image</p>
+                        </div>
+                    @endif
                 </div>
             </div>
             

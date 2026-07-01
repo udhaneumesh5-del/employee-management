@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Http\Requests\EmployeeRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
@@ -33,7 +34,15 @@ class EmployeeController extends Controller
 
     public function store(EmployeeRequest $request)
     {
-        Employee::create($request->validated());
+        $data = $request->validated();
+
+        // Handle image upload
+        if ($request->hasFile('profile_image')) {
+            $imagePath = $request->file('profile_image')->store('employees', 'public');
+            $data['profile_image'] = $imagePath;
+        }
+
+        Employee::create($data);
         
         return redirect()->route('employees.index')
             ->with('success', 'Employee created successfully!');
@@ -46,7 +55,21 @@ class EmployeeController extends Controller
 
     public function update(EmployeeRequest $request, Employee $employee)
     {
-        $employee->update($request->validated());
+        $data = $request->validated();
+
+        // Handle image upload
+        if ($request->hasFile('profile_image')) {
+            // Delete old image
+            if ($employee->profile_image) {
+                Storage::disk('public')->delete($employee->profile_image);
+            }
+            
+            // Store new image
+            $imagePath = $request->file('profile_image')->store('employees', 'public');
+            $data['profile_image'] = $imagePath;
+        }
+
+        $employee->update($data);
         
         return redirect()->route('employees.index')
             ->with('success', 'Employee updated successfully!');
@@ -54,6 +77,11 @@ class EmployeeController extends Controller
 
     public function destroy(Employee $employee)
     {
+        // Delete profile image
+        if ($employee->profile_image) {
+            Storage::disk('public')->delete($employee->profile_image);
+        }
+
         $employee->delete();
         
         return redirect()->route('employees.index')

@@ -6,7 +6,7 @@
         <h5>Add New Employee</h5>
     </div>
     <div class="card-body">
-        <form action="{{ route('employees.store') }}" method="POST">
+        <form action="{{ route('employees.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             
             <div class="row">
@@ -98,6 +98,17 @@
                         <option value="Inactive" {{ old('status') == 'Inactive' ? 'selected' : '' }}>Inactive</option>
                     </select>
                     @error('status')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="profile_image" class="form-label">Profile Image</label>
+                    <input type="file" name="profile_image" id="profile_image" 
+                           class="form-control @error('profile_image') is-invalid @enderror" 
+                           accept="image/*">
+                    <small class="text-muted">Supported: jpeg, png, jpg, gif (Max: 2MB)</small>
+                    @error('profile_image')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>

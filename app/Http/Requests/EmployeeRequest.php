@@ -24,7 +24,8 @@ class EmployeeRequest extends FormRequest
             'designation' => 'required|string|max:100',
             'salary' => 'required|numeric|min:0',
             'joining_date' => 'required|date',
-            'status' => 'required|in:Active,Inactive'
+            'status' => 'required|in:Active,Inactive',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // Added image validation
         ];
     }
 
@@ -35,7 +36,10 @@ class EmployeeRequest extends FormRequest
             'employee_code.unique' => 'Employee code already exists',
             'email.required' => 'Email is required',
             'email.unique' => 'Email already exists',
-            'salary.min' => 'Salary cannot be negative'
+            'salary.min' => 'Salary cannot be negative',
+            'profile_image.image' => 'File must be an image',
+            'profile_image.mimes' => 'Image must be jpeg, png, jpg or gif',
+            'profile_image.max' => 'Image size must be less than 2MB'
         ];
     }
 }

@@ -9,7 +9,7 @@
         </a>
     </div>
     <div class="card-body">
-        <!-- Search -->
+        <!-- Search Form -->
         <form action="{{ route('employees.index') }}" method="GET" class="mb-3">
             <div class="row">
                 <div class="col-md-6">
@@ -26,12 +26,13 @@
             </div>
         </form>
 
-        <!-- Table -->
+        <!-- Employee Table -->
         <div class="table-responsive">
             <table class="table table-striped table-bordered">
                 <thead class="table-dark">
                     <tr>
                         <th>#</th>
+                        <th>Photo</th>
                         <th>Employee Code</th>
                         <th>First Name</th>
                         <th>Last Name</th>
@@ -48,6 +49,12 @@
                     @forelse($employees as $employee)
                     <tr>
                         <td>{{ $loop->iteration + ($employees->currentPage() - 1) * $employees->perPage() }}</td>
+                        <td>
+                            <img src="{{ $employee->profile_image_url }}" 
+                                 alt="{{ $employee->first_name }}" 
+                                 width="50" height="50" 
+                                 style="border-radius: 50%; object-fit: cover;">
+                        </td>
                         <td>{{ $employee->employee_code }}</td>
                         <td>{{ $employee->first_name }}</td>
                         <td>{{ $employee->last_name }}</td>
@@ -65,7 +72,7 @@
                         </td>
                         <td class="text-nowrap">
                             <a href="{{ route('employees.edit', $employee->id) }}" 
-                               class="btn btn-warning btn-sm me-1">Update</a>
+                               class="btn btn-warning btn-sm">Update</a>
                             <button type="button" class="btn btn-danger btn-sm" 
                                     onclick="confirmDelete({{ $employee->id }})">
                                 Delete
@@ -80,7 +87,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="11" class="text-center">No employees found</td>
+                        <td colspan="12" class="text-center">No employees found</td>
                     </tr>
                     @endforelse
                 </tbody>
