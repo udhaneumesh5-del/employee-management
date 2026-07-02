@@ -25,7 +25,8 @@ class EmployeeRequest extends FormRequest
             'salary' => 'required|numeric|min:0',
             'joining_date' => 'required|date',
             'status' => 'required|in:Active,Inactive',
-            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // Added image validation
+            'department_id' => 'nullable|exists:departments,id',  
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ];
     }
 
@@ -37,6 +38,7 @@ class EmployeeRequest extends FormRequest
             'email.required' => 'Email is required',
             'email.unique' => 'Email already exists',
             'salary.min' => 'Salary cannot be negative',
+            'department_id.exists' => 'Selected department does not exist',
             'profile_image.image' => 'File must be an image',
             'profile_image.mimes' => 'Image must be jpeg, png, jpg or gif',
             'profile_image.max' => 'Image size must be less than 2MB'

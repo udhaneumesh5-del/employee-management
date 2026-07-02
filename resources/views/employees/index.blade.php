@@ -29,7 +29,7 @@
         <!-- Employee Table -->
         <div class="table-responsive">
             <table class="table table-striped table-bordered">
-                <thead class="table-dark">
+                <thead class="table-dark">d
                     <tr>
                         <th>#</th>
                         <th>Photo</th>
@@ -39,6 +39,7 @@
                         <th>Email</th>
                         <th>Mobile</th>
                         <th>Designation</th>
+                        <th>Department</th>
                         <th>Salary</th>
                         <th>Joining Date</th>
                         <th>Status</th>
@@ -61,6 +62,13 @@
                         <td>{{ $employee->email }}</td>
                         <td>{{ $employee->mobile_number }}</td>
                         <td>{{ $employee->designation }}</td>
+                        <td>
+                            @if($employee->department)
+                                <span class="badge bg-info">{{ $employee->department->department_name }}</span>
+                            @else
+                                <span class="badge bg-secondary">N/A</span>
+                            @endif
+                        </td>
                         <td>{{ number_format($employee->salary, 2) }}</td>
                         <td>{{ date('d-m-Y', strtotime($employee->joining_date)) }}</td>
                         <td>
@@ -87,7 +95,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="12" class="text-center">No employees found</td>
+                        <td colspan="13" class="text-center">No employees found</td>
                     </tr>
                     @endforelse
                 </tbody>

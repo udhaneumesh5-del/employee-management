@@ -9,14 +9,18 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid px-18">
-            <a class="navbar-brand" href="{{ route('employees.index') }}">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand text-white" href="{{ route('employees.index') }}">
                 Employee Management
             </a>
+            <div class="navbar-nav">
+                <a class="nav-link text-white" href="{{ route('employees.index') }}">Employees</a>
+                <a class="nav-link text-white" href="{{ route('departments.index') }}">Departments</a>
+            </div>
         </div>
     </nav>
 
-    <div class="container mt-4 px-18">
+    <div class="container-fluid mt-4 ">
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show">
                 {{ session('success') }}
