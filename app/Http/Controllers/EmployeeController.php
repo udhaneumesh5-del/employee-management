@@ -12,8 +12,9 @@ class EmployeeController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Employee::query();
+        $query = Employee::with('department'); // Eager Loading
 
+        // Search functionality
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -23,7 +24,20 @@ class EmployeeController extends Controller
             });
         }
 
-        $employees = $query->with('department')->latest()->paginate(10);
+        // Sorting by Name
+        if ($request->sort_by == 'name') {
+            $query->orderBy('first_name', $request->sort_order ?? 'asc');
+        }
+        // Sorting by Joining Date
+        elseif ($request->sort_by == 'joining_date') {
+            $query->orderBy('joining_date', $request->sort_order ?? 'asc');
+        }
+        // Default sorting
+        else {
+            $query->latest();
+        }
+
+        $employees = $query->paginate(10);
         
         return view('employees.index', compact('employees'));
     }

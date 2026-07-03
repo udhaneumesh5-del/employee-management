@@ -9,10 +9,10 @@
         </a>
     </div>
     <div class="card-body">
-        <!-- Search Form -->
+        <!-- Search and Sorting -->
         <form action="{{ route('employees.index') }}" method="GET" class="mb-3">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="input-group">
                         <input type="text" name="search" class="form-control" 
                                placeholder="Search by name or email..." 
@@ -23,25 +23,52 @@
                         @endif
                     </div>
                 </div>
+                
+                <div class="col-md-3">
+                    <select name="sort_by" class="form-control" onchange="this.form.submit()">
+                        <option value="">Sort By</option>
+                        <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Name</option>
+                        <option value="joining_date" {{ request('sort_by') == 'joining_date' ? 'selected' : '' }}>Joining Date</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-2">
+                    <select name="sort_order" class="form-control" onchange="this.form.submit()">
+                        <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>Ascending</option>
+                        <option value="desc" {{ request('sort_order') == 'desc' ? 'selected' : '' }}>Descending</option>
+                    </select>
+                </div>
             </div>
         </form>
 
         <!-- Employee Table -->
         <div class="table-responsive">
             <table class="table table-striped table-bordered">
-                <thead class="table-dark">d
+                <thead class="table-dark">
                     <tr>
                         <th>#</th>
                         <th>Photo</th>
-                        <th>Employee Code</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Mobile</th>
-                        <th>Designation</th>
+                        <th>
+                            <a href="{{ route('employees.index', array_merge(request()->query(), ['sort_by' => 'name', 'sort_order' => request('sort_order') == 'asc' ? 'desc' : 'asc'])) }}" 
+                               class="text-white text-decoration-none">
+                                Employee Name
+                                @if(request('sort_by') == 'name')
+                                    <i class="fas fa-sort-{{ request('sort_order') == 'asc' ? 'up' : 'down' }}"></i>
+                                @endif
+                            </a>
+                        </th>
                         <th>Department</th>
+                        <th>Designation</th>
                         <th>Salary</th>
-                        <th>Joining Date</th>
+                        <th>
+                            <a href="{{ route('employees.index', array_merge(request()->query(), ['sort_by' => 'joining_date', 'sort_order' => request('sort_order') == 'asc' ? 'desc' : 'asc'])) }}" 
+                               class="text-white text-decoration-none">
+                                Joining Date
+                                @if(request('sort_by') == 'joining_date')
+                                    <i class="fas fa-sort-{{ request('sort_order') == 'asc' ? 'up' : 'down' }}"></i>
+                                @endif
+                            </a>
+                        </th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -56,19 +83,9 @@
                                  width="50" height="50" 
                                  style="border-radius: 50%; object-fit: cover;">
                         </td>
-                        <td>{{ $employee->employee_code }}</td>
-                        <td>{{ $employee->first_name }}</td>
-                        <td>{{ $employee->last_name }}</td>
-                        <td>{{ $employee->email }}</td>
-                        <td>{{ $employee->mobile_number }}</td>
+                        <td>{{ $employee->first_name }} {{ $employee->last_name }}</td>
+                        <td>{{ $employee->department ? $employee->department->department_name : 'N/A' }}</td>
                         <td>{{ $employee->designation }}</td>
-                        <td>
-                            @if($employee->department)
-                                <span class="badge bg-info">{{ $employee->department->department_name }}</span>
-                            @else
-                                <span class="badge bg-secondary">N/A</span>
-                            @endif
-                        </td>
                         <td>{{ number_format($employee->salary, 2) }}</td>
                         <td>{{ date('d-m-Y', strtotime($employee->joining_date)) }}</td>
                         <td>
@@ -78,7 +95,7 @@
                                 <span class="badge bg-danger">Inactive</span>
                             @endif
                         </td>
-                        <td class="text-nowrap">
+                        <td>
                             <a href="{{ route('employees.edit', $employee->id) }}" 
                                class="btn btn-warning btn-sm">Update</a>
                             <button type="button" class="btn btn-danger btn-sm" 
@@ -95,7 +112,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="13" class="text-center">No employees found</td>
+                        <td colspan="9" class="text-center">No employees found</td>
                     </tr>
                     @endforelse
                 </tbody>
