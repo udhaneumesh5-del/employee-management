@@ -12,7 +12,12 @@ class EmployeeController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Employee::with('department'); // Eager Loading
+        $query = Employee::with('department');
+
+        // Filter by status (for dashboard clicks)
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
 
         // Search functionality
         if ($request->filled('search')) {
@@ -24,16 +29,12 @@ class EmployeeController extends Controller
             });
         }
 
-        // Sorting by Name
+        // Sorting
         if ($request->sort_by == 'name') {
             $query->orderBy('first_name', $request->sort_order ?? 'asc');
-        }
-        // Sorting by Joining Date
-        elseif ($request->sort_by == 'joining_date') {
+        } elseif ($request->sort_by == 'joining_date') {
             $query->orderBy('joining_date', $request->sort_order ?? 'asc');
-        }
-        // Default sorting
-        else {
+        } else {
             $query->latest();
         }
 

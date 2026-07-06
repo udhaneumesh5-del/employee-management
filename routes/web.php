@@ -2,14 +2,10 @@
 
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return redirect()->route('employees.index');
-});
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-// Employee Routes
 Route::resource('employees', EmployeeController::class);
-
-// Department Routes
 Route::resource('departments', DepartmentController::class);

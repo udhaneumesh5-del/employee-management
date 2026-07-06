@@ -3,7 +3,14 @@
 @section('content')
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5>Employee List</h5>
+        <h5>
+            Employee List
+            @if(request('status'))
+                <span class="badge bg-{{ request('status') == 'Active' ? 'success' : 'danger' }}">
+                    {{ request('status') }}
+                </span>
+            @endif
+        </h5>
         <a href="{{ route('employees.create') }}" class="btn btn-primary btn-sm">
             Add New Employee
         </a>
@@ -18,7 +25,7 @@
                                placeholder="Search by name or email..." 
                                value="{{ request('search') }}">
                         <button type="submit" class="btn btn-primary">Search</button>
-                        @if(request('search'))
+                        @if(request('search') || request('status'))
                             <a href="{{ route('employees.index') }}" class="btn btn-secondary">Clear</a>
                         @endif
                     </div>
@@ -38,6 +45,11 @@
                         <option value="desc" {{ request('sort_order') == 'desc' ? 'selected' : '' }}>Descending</option>
                     </select>
                 </div>
+
+                <!-- Hidden status field to maintain filter -->
+                @if(request('status'))
+                    <input type="hidden" name="status" value="{{ request('status') }}">
+                @endif
             </div>
         </form>
 
