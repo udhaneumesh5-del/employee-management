@@ -10,16 +10,14 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Card data
         $totalEmployees = Employee::count();
         $totalDepartments = Department::count();
         $activeEmployees = Employee::where('status', 'Active')->count();
         $inactiveEmployees = Employee::where('status', 'Inactive')->count();
         
-        // Recent employees (last 10)
         $recentEmployees = Employee::with('department')
                                   ->latest()
-                                  ->take(10)
+                                  ->take(5)
                                   ->get();
         
         return view('dashboard', compact(

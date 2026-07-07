@@ -14,12 +14,10 @@ class EmployeeController extends Controller
     {
         $query = Employee::with('department');
 
-        // Filter by status (for dashboard clicks)
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Search functionality
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -29,7 +27,6 @@ class EmployeeController extends Controller
             });
         }
 
-        // Sorting
         if ($request->sort_by == 'name') {
             $query->orderBy('first_name', $request->sort_order ?? 'asc');
         } elseif ($request->sort_by == 'joining_date') {
