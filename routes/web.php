@@ -9,12 +9,22 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
-// ✅ Protected routes with auth middleware
+// All routes require authentication
 Route::middleware(['auth'])->group(function () {
+
+    // Dashboard - Both Admin and HR can access
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('employees', EmployeeController::class);
-    Route::resource('departments', DepartmentController::class);
+
+    // Department routes - Only Admin can access
+    Route::middleware(['role:Admin'])->group(function () {
+        Route::resource('departments', DepartmentController::class);
+    });
+
+    // Employee routes - Both Admin and HR can access
+    Route::middleware(['role:Admin,HR'])->group(function () {
+        Route::resource('employees', EmployeeController::class);
+    });
 });
 
-// Authentication routes
+// Auth routes
 require __DIR__.'/auth.php';

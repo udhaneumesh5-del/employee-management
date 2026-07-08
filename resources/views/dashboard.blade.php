@@ -2,7 +2,17 @@
 
 @section('content')
 <div class="row">
-    <!-- Card 1: Total Employees -->
+    <!-- Welcome Message -->
+    <div class="col-12 mb-4">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h4>Welcome, {{ Auth::user()->name }}!</h4>
+                <p>Role: <span class="badge bg-primary">{{ Auth::user()->role }}</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards -->
     <div class="col-md-3 mb-3">
         <a href="{{ route('employees.index') }}" class="text-decoration-none">
             <div class="card text-white bg-primary">
@@ -14,7 +24,6 @@
         </a>
     </div>
 
-    <!-- Card 2: Total Departments -->
     <div class="col-md-3 mb-3">
         <a href="{{ route('departments.index') }}" class="text-decoration-none">
             <div class="card text-white bg-success">
@@ -26,7 +35,6 @@
         </a>
     </div>
 
-    <!-- Card 3: Active Employees -->
     <div class="col-md-3 mb-3">
         <a href="{{ route('employees.index', ['status' => 'Active']) }}" class="text-decoration-none">
             <div class="card text-white bg-info">
@@ -38,7 +46,6 @@
         </a>
     </div>
 
-    <!-- Card 4: Inactive Employees -->
     <div class="col-md-3 mb-3">
         <a href="{{ route('employees.index', ['status' => 'Inactive']) }}" class="text-decoration-none">
             <div class="card text-white bg-danger">
