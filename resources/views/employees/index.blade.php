@@ -3,20 +3,18 @@
 @section('content')
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5>
-            Employee List
-            @if(request('status'))
-                <span class="badge bg-{{ request('status') == 'Active' ? 'success' : 'danger' }}">
-                    {{ request('status') }}
-                </span>
-            @endif
-        </h5>
-        <a href="{{ route('employees.create') }}" class="btn btn-primary btn-sm">
-            Add New Employee
-        </a>
+        <h5>Employee List</h5>
+        <div>
+            <a href="{{ route('employees.trash') }}" class="btn btn-secondary btn-sm me-2">
+                <i class="fas fa-trash"></i> Trash
+            </a>
+            <a href="{{ route('employees.create') }}" class="btn btn-primary btn-sm">
+                Add New Employee
+            </a>
+        </div>
     </div>
     <div class="card-body">
-        <!-- Search and Sorting -->
+        <!-- Search and Sorting Form -->
         <form action="{{ route('employees.index') }}" method="GET" class="mb-3">
             <div class="row">
                 <div class="col-md-4">
@@ -46,7 +44,6 @@
                     </select>
                 </div>
 
-                <!-- Hidden status field to maintain filter -->
                 @if(request('status'))
                     <input type="hidden" name="status" value="{{ request('status') }}">
                 @endif
@@ -60,27 +57,11 @@
                     <tr>
                         <th>#</th>
                         <th>Photo</th>
-                        <th>
-                            <a href="{{ route('employees.index', array_merge(request()->query(), ['sort_by' => 'name', 'sort_order' => request('sort_order') == 'asc' ? 'desc' : 'asc'])) }}" 
-                               class="text-white text-decoration-none">
-                                Employee Name
-                                @if(request('sort_by') == 'name')
-                                    <i class="fas fa-sort-{{ request('sort_order') == 'asc' ? 'up' : 'down' }}"></i>
-                                @endif
-                            </a>
-                        </th>
+                        <th>Name</th>
                         <th>Department</th>
                         <th>Designation</th>
                         <th>Salary</th>
-                        <th>
-                            <a href="{{ route('employees.index', array_merge(request()->query(), ['sort_by' => 'joining_date', 'sort_order' => request('sort_order') == 'asc' ? 'desc' : 'asc'])) }}" 
-                               class="text-white text-decoration-none">
-                                Joining Date
-                                @if(request('sort_by') == 'joining_date')
-                                    <i class="fas fa-sort-{{ request('sort_order') == 'asc' ? 'up' : 'down' }}"></i>
-                                @endif
-                            </a>
-                        </th>
+                        <th>Joining Date</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>

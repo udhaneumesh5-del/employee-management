@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
+    // Main Index - Show active departments
     public function index()
     {
         $departments = Department::latest()->paginate(10);
@@ -51,11 +52,42 @@ class DepartmentController extends Controller
             ->with('success', 'Department updated successfully!');
     }
 
+    // Soft Delete - Move to Trash
     public function destroy(Department $department)
     {
         $department->delete();
-
+        
         return redirect()->route('departments.index')
-            ->with('success', 'Department deleted successfully!');
+            ->with('success', 'Department moved to trash successfully!');
+    }
+
+    // Show Trash Page
+    public function trash()
+    {
+        $departments = Department::onlyTrashed()
+                            ->latest('deleted_at')
+                            ->paginate(10);
+        
+        return view('departments.trash', compact('departments'));
+    }
+
+    // Restore Department
+    public function restore($id)
+    {
+        $department = Department::onlyTrashed()->findOrFail($id);
+        $department->restore();
+        
+        return redirect()->route('departments.trash')
+            ->with('success', 'Department restored successfully!');
+    }
+
+    // Permanently Delete
+    public function forceDelete($id)
+    {
+        $department = Department::onlyTrashed()->findOrFail($id);
+        $department->forceDelete();
+        
+        return redirect()->route('departments.trash')
+            ->with('success', 'Department deleted permanently!');
     }
 }

@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 class Employee extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'employee_code',
@@ -21,16 +22,16 @@ class Employee extends Model
         'joining_date',
         'status',
         'profile_image',
-        'department_id'  
+        'department_id'
     ];
 
-    // Employee belongs to department
+    protected $dates = ['deleted_at'];
+
     public function department()
     {
         return $this->belongsTo(Department::class);
     }
 
-    // Get profile image URL
     public function getProfileImageUrlAttribute()
     {
         if ($this->profile_image && Storage::disk('public')->exists($this->profile_image)) {

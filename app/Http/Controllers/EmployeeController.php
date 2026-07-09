@@ -61,6 +61,13 @@ class EmployeeController extends Controller
             ->with('success', 'Employee created successfully!');
     }
 
+    public function show($id)
+    {
+        // Optional: Show single employee
+        $employee = Employee::with('department')->findOrFail($id);
+        return view('employees.show', compact('employee'));
+    }
+
     public function edit(Employee $employee)
     {
         $departments = Department::where('status', 'Active')->get();
@@ -86,15 +93,48 @@ class EmployeeController extends Controller
             ->with('success', 'Employee updated successfully!');
     }
 
+    // Soft Delete - Move to Trash
     public function destroy(Employee $employee)
     {
-        if ($employee->profile_image) {
-            Storage::disk('public')->delete($employee->profile_image);
-        }
-
         $employee->delete();
         
         return redirect()->route('employees.index')
-            ->with('success', 'Employee deleted successfully!');
+            ->with('success', 'Employee moved to trash successfully!');
+    }
+
+    // Show Trash Page
+    public function trash()
+    {
+        $employees = Employee::onlyTrashed()
+                            ->with('department')
+                            ->latest('deleted_at')
+                            ->paginate(10);
+        
+        return view('employees.trash', compact('employees'));
+    }
+
+    // Restore Employee
+    public function restore($id)
+    {
+        $employee = Employee::onlyTrashed()->findOrFail($id);
+        $employee->restore();
+        
+        return redirect()->route('employees.trash')
+            ->with('success', 'Employee restored successfully!');
+    }
+
+    // Permanently Delete
+    public function forceDelete($id)
+    {
+        $employee = Employee::onlyTrashed()->findOrFail($id);
+        
+        if ($employee->profile_image) {
+            Storage::disk('public')->delete($employee->profile_image);
+        }
+        
+        $employee->forceDelete();
+        
+        return redirect()->route('employees.trash')
+            ->with('success', 'Employee deleted permanently!');
     }
 }

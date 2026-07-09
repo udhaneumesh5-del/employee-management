@@ -9,22 +9,33 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
-// All routes require authentication
 Route::middleware(['auth'])->group(function () {
 
-    // Dashboard - Both Admin and HR can access
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Department routes - Only Admin can access
+    // Department routes - Only Admin
     Route::middleware(['role:Admin'])->group(function () {
-        Route::resource('departments', DepartmentController::class);
+        
+        // Department Trash routes - BEFORE resource
+        Route::get('/departments/trash', [DepartmentController::class, 'trash'])->name('departments.trash');
+        Route::post('/departments/{id}/restore', [DepartmentController::class, 'restore'])->name('departments.restore');
+        Route::delete('/departments/{id}/force-delete', [DepartmentController::class, 'forceDelete'])->name('departments.force-delete');
+        
+        // Department Resource route - WITHOUT show
+        Route::resource('departments', DepartmentController::class)->except(['show']);
     });
 
-    // Employee routes - Both Admin and HR can access
+    // Employee routes - Admin and HR
     Route::middleware(['role:Admin,HR'])->group(function () {
-        Route::resource('employees', EmployeeController::class);
+        
+        // Employee Trash routes - BEFORE resource
+        Route::get('/employees/trash', [EmployeeController::class, 'trash'])->name('employees.trash');
+        Route::post('/employees/{id}/restore', [EmployeeController::class, 'restore'])->name('employees.restore');
+        Route::delete('/employees/{id}/force-delete', [EmployeeController::class, 'forceDelete'])->name('employees.force-delete');
+        
+        // Employee Resource route - WITHOUT show
+        Route::resource('employees', EmployeeController::class)->except(['show']);
     });
 });
 
-// Auth routes
 require __DIR__.'/auth.php';
