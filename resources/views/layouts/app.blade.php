@@ -33,6 +33,17 @@
                         @endif
                     @endauth
                     
+                    <!-- Activity Logs - Only Admin can see -->
+                    @auth
+                        @if(Auth::user()->isAdmin())
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('activity-logs.index') }}">
+                                    <i class="fas fa-history"></i> Activity Logs
+                                </a>
+                            </li>
+                        @endif
+                    @endauth
+                    
                     <!-- Employees - Both Admin and HR can see -->
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('employees.index') }}">Employees</a>

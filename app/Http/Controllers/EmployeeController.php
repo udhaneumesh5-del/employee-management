@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Http\Requests\EmployeeRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;  // ✅ Add this
 
 class EmployeeController extends Controller
 {
@@ -55,17 +56,20 @@ class EmployeeController extends Controller
             $data['profile_image'] = $imagePath;
         }
 
-        Employee::create($data);
+        $employee = Employee::create($data);
+
+        // ✅ Log: Employee Created (Using DB facade)
+        DB::table('activity_logs')->insert([
+            'employee_name' => $employee->first_name . ' ' . $employee->last_name,
+            'action' => 'Created',
+            'performed_by' => auth()->user()->name,
+            'performed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
         
         return redirect()->route('employees.index')
             ->with('success', 'Employee created successfully!');
-    }
-
-    public function show($id)
-    {
-        // Optional: Show single employee
-        $employee = Employee::with('department')->findOrFail($id);
-        return view('employees.show', compact('employee'));
     }
 
     public function edit(Employee $employee)
@@ -88,21 +92,40 @@ class EmployeeController extends Controller
         }
 
         $employee->update($data);
+
+        // ✅ Log: Employee Updated (Using DB facade)
+        DB::table('activity_logs')->insert([
+            'employee_name' => $employee->first_name . ' ' . $employee->last_name,
+            'action' => 'Updated',
+            'performed_by' => auth()->user()->name,
+            'performed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
         
         return redirect()->route('employees.index')
             ->with('success', 'Employee updated successfully!');
     }
 
-    // Soft Delete - Move to Trash
     public function destroy(Employee $employee)
     {
+        $employeeName = $employee->first_name . ' ' . $employee->last_name;
         $employee->delete();
+
+        // ✅ Log: Employee Deleted (Using DB facade)
+        DB::table('activity_logs')->insert([
+            'employee_name' => $employeeName,
+            'action' => 'Deleted',
+            'performed_by' => auth()->user()->name,
+            'performed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
         
         return redirect()->route('employees.index')
             ->with('success', 'Employee moved to trash successfully!');
     }
 
-    // Show Trash Page
     public function trash()
     {
         $employees = Employee::onlyTrashed()
@@ -113,17 +136,25 @@ class EmployeeController extends Controller
         return view('employees.trash', compact('employees'));
     }
 
-    // Restore Employee
     public function restore($id)
     {
         $employee = Employee::onlyTrashed()->findOrFail($id);
         $employee->restore();
+
+        // ✅ Log: Employee Restored (Using DB facade)
+        DB::table('activity_logs')->insert([
+            'employee_name' => $employee->first_name . ' ' . $employee->last_name,
+            'action' => 'Restored',
+            'performed_by' => auth()->user()->name,
+            'performed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
         
         return redirect()->route('employees.trash')
             ->with('success', 'Employee restored successfully!');
     }
 
-    // Permanently Delete
     public function forceDelete($id)
     {
         $employee = Employee::onlyTrashed()->findOrFail($id);
