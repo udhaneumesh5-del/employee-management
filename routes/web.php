@@ -32,6 +32,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/employees/trash', [EmployeeController::class, 'trash'])->name('employees.trash');
         Route::post('/employees/{id}/restore', [EmployeeController::class, 'restore'])->name('employees.restore');
         Route::delete('/employees/{id}/force-delete', [EmployeeController::class, 'forceDelete'])->name('employees.force-delete');
+        
+        // ✅ CSV Export Route
+        Route::get('/employees/export/csv', [EmployeeController::class, 'exportCSV'])->name('employees.export.csv');
+        
         Route::resource('employees', EmployeeController::class)->except(['show']);
     });
 });

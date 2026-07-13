@@ -5,6 +5,10 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5>Employee List</h5>
         <div>
+            <!-- ✅ Export CSV Button -->
+            <a href="{{ route('employees.export.csv') }}" class="btn btn-success btn-sm me-2">
+                <i class="fas fa-file-export"></i> Export CSV
+            </a>
             <a href="{{ route('employees.trash') }}" class="btn btn-secondary btn-sm me-2">
                 <i class="fas fa-trash"></i> Trash
             </a>

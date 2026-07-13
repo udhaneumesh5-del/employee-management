@@ -7,7 +7,7 @@ use App\Models\Department;
 use App\Http\Requests\EmployeeRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;  // ✅ Add this
+use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
 {
@@ -58,7 +58,7 @@ class EmployeeController extends Controller
 
         $employee = Employee::create($data);
 
-        // ✅ Log: Employee Created (Using DB facade)
+        // Log activity
         DB::table('activity_logs')->insert([
             'employee_name' => $employee->first_name . ' ' . $employee->last_name,
             'action' => 'Created',
@@ -93,7 +93,6 @@ class EmployeeController extends Controller
 
         $employee->update($data);
 
-        // ✅ Log: Employee Updated (Using DB facade)
         DB::table('activity_logs')->insert([
             'employee_name' => $employee->first_name . ' ' . $employee->last_name,
             'action' => 'Updated',
@@ -112,7 +111,6 @@ class EmployeeController extends Controller
         $employeeName = $employee->first_name . ' ' . $employee->last_name;
         $employee->delete();
 
-        // ✅ Log: Employee Deleted (Using DB facade)
         DB::table('activity_logs')->insert([
             'employee_name' => $employeeName,
             'action' => 'Deleted',
@@ -141,7 +139,6 @@ class EmployeeController extends Controller
         $employee = Employee::onlyTrashed()->findOrFail($id);
         $employee->restore();
 
-        // ✅ Log: Employee Restored (Using DB facade)
         DB::table('activity_logs')->insert([
             'employee_name' => $employee->first_name . ' ' . $employee->last_name,
             'action' => 'Restored',
@@ -167,5 +164,46 @@ class EmployeeController extends Controller
         
         return redirect()->route('employees.trash')
             ->with('success', 'Employee deleted permanently!');
+    }
+
+    // ✅ CSV Export Method
+    public function exportCSV()
+    {
+        $employees = Employee::with('department')->get();
+
+        $filename = 'employees_' . date('Y_m_d') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function() use ($employees) {
+            $file = fopen('php://output', 'w');
+
+            fputcsv($file, [
+                'Employee Code',
+                'Name',
+                'Email',
+                'Department',
+                'Salary',
+                'Joining Date'
+            ]);
+
+            foreach ($employees as $employee) {
+                fputcsv($file, [
+                    $employee->employee_code,
+                    $employee->first_name . ' ' . $employee->last_name,
+                    $employee->email,
+                    $employee->department ? $employee->department->department_name : 'N/A',
+                    $employee->salary,
+                    date('d-m-Y', strtotime($employee->joining_date))
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }
