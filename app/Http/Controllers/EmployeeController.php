@@ -72,6 +72,15 @@ class EmployeeController extends Controller
             ->with('success', 'Employee created successfully!');
     }
 
+    /**
+     * Display employee profile page
+     */
+    public function show($id)
+    {
+        $employee = Employee::with('department')->findOrFail($id);
+        return view('employees.show', compact('employee'));
+    }
+
     public function edit(Employee $employee)
     {
         $departments = Department::where('status', 'Active')->get();
@@ -166,7 +175,9 @@ class EmployeeController extends Controller
             ->with('success', 'Employee deleted permanently!');
     }
 
-    // ✅ CSV Export Method
+    /**
+     * CSV Export Method
+     */
     public function exportCSV()
     {
         $employees = Employee::with('department')->get();

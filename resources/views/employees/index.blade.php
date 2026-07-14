@@ -5,7 +5,6 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5>Employee List</h5>
         <div>
-            <!-- ✅ Export CSV Button -->
             <a href="{{ route('employees.export.csv') }}" class="btn btn-success btn-sm me-2">
                 <i class="fas fa-file-export"></i> Export CSV
             </a>
@@ -61,7 +60,10 @@
                     <tr>
                         <th>#</th>
                         <th>Photo</th>
+                        <th>Employee Code</th>      
                         <th>Name</th>
+                        <th>Email</th>              
+                        <th>Mobile</th>             
                         <th>Department</th>
                         <th>Designation</th>
                         <th>Salary</th>
@@ -80,7 +82,10 @@
                                  width="50" height="50" 
                                  style="border-radius: 50%; object-fit: cover;">
                         </td>
+                        <td>{{ $employee->employee_code }}</td>           
                         <td>{{ $employee->first_name }} {{ $employee->last_name }}</td>
+                        <td>{{ $employee->email }}</td>                   
+                        <td>{{ $employee->mobile_number }}</td>           
                         <td>{{ $employee->department ? $employee->department->department_name : 'N/A' }}</td>
                         <td>{{ $employee->designation }}</td>
                         <td>{{ number_format($employee->salary, 2) }}</td>
@@ -93,11 +98,14 @@
                             @endif
                         </td>
                         <td>
-                            <a href="{{ route('employees.edit', $employee->id) }}" 
-                               class="btn btn-warning btn-sm">Update</a>
-                            <button type="button" class="btn btn-danger btn-sm" 
-                                    onclick="confirmDelete({{ $employee->id }})">
-                                Delete
+                            <a href="{{ route('employees.show', $employee->id) }}" class="btn btn-info btn-sm text-white">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $employee->id }})">
+                                <i class="fas fa-trash"></i>
                             </button>
                             <form id="delete-form-{{ $employee->id }}" 
                                   action="{{ route('employees.destroy', $employee->id) }}" 
@@ -109,7 +117,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9" class="text-center">No employees found</td>
+                        <td colspan="12" class="text-center">No employees found</td>
                     </tr>
                     @endforelse
                 </tbody>

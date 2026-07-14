@@ -11,7 +11,7 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
+        <div class="container-fluid px-4">
             <a class="navbar-brand" href="{{ route('dashboard') }}">
                 Employee Management
             </a>
@@ -78,7 +78,7 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container-fluid px-4 mt-4">
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show">
                 {{ session('success') }}
