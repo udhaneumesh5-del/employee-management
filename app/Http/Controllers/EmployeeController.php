@@ -15,30 +15,62 @@ class EmployeeController extends Controller
     {
         $query = Employee::with('department');
 
+        // Filter by Employee Name
+        if ($request->filled('name')) {
+            $query->where(function($q) use ($request) {
+                $q->where('first_name', 'LIKE', '%' . $request->name . '%')
+                  ->orWhere('last_name', 'LIKE', '%' . $request->name . '%');
+            });
+        }
+
+        // Filter by Email
+        if ($request->filled('email')) {
+            $query->where('email', 'LIKE', '%' . $request->email . '%');
+        }
+
+        // Filter by Department
+        if ($request->filled('department_id')) {
+            $query->where('department_id', $request->department_id);
+        }
+
+        // Filter by Status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('first_name', 'LIKE', "%{$search}%")
-                  ->orWhere('last_name', 'LIKE', "%{$search}%")
-                  ->orWhere('email', 'LIKE', "%{$search}%");
-            });
+        // Filter by Joining Date Range
+        if ($request->filled('joining_from')) {
+            $query->whereDate('joining_date', '>=', $request->joining_from);
+        }
+        if ($request->filled('joining_to')) {
+            $query->whereDate('joining_date', '<=', $request->joining_to);
         }
 
+        // Filter by Salary Range
+        if ($request->filled('salary_min')) {
+            $query->where('salary', '>=', $request->salary_min);
+        }
+        if ($request->filled('salary_max')) {
+            $query->where('salary', '<=', $request->salary_max);
+        }
+
+        // Sorting
         if ($request->sort_by == 'name') {
             $query->orderBy('first_name', $request->sort_order ?? 'asc');
         } elseif ($request->sort_by == 'joining_date') {
             $query->orderBy('joining_date', $request->sort_order ?? 'asc');
+        } elseif ($request->sort_by == 'salary') {
+            $query->orderBy('salary', $request->sort_order ?? 'asc');
         } else {
             $query->latest();
         }
 
         $employees = $query->paginate(10);
         
-        return view('employees.index', compact('employees'));
+        // Get departments for filter dropdown
+        $departments = Department::where('status', 'Active')->get();
+        
+        return view('employees.index', compact('employees', 'departments'));
     }
 
     public function create()
