@@ -54,14 +54,24 @@ class EmployeeController extends Controller
             $query->where('salary', '<=', $request->salary_max);
         }
 
-        // Sorting
+        //  Sorting by Name
         if ($request->sort_by == 'name') {
             $query->orderBy('first_name', $request->sort_order ?? 'asc');
-        } elseif ($request->sort_by == 'joining_date') {
+        }
+        //  Sorting by Email
+        elseif ($request->sort_by == 'email') {
+            $query->orderBy('email', $request->sort_order ?? 'asc');
+        }
+        //  Sorting by Joining Date
+        elseif ($request->sort_by == 'joining_date') {
             $query->orderBy('joining_date', $request->sort_order ?? 'asc');
-        } elseif ($request->sort_by == 'salary') {
-            $query->orderBy('salary', $request->sort_order ?? 'asc');
-        } else {
+        }
+        //  Sorting by Status
+        elseif ($request->sort_by == 'status') {
+            $query->orderBy('status', $request->sort_order ?? 'asc');
+        }
+        // Default sorting
+        else {
             $query->latest();
         }
 
@@ -72,7 +82,6 @@ class EmployeeController extends Controller
         
         return view('employees.index', compact('employees', 'departments'));
     }
-
     public function create()
     {
         $departments = Department::where('status', 'Active')->get();

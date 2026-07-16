@@ -12,7 +12,7 @@
                 <i class="fas fa-trash"></i> Trash
             </a>
             <a href="{{ route('employees.create') }}" class="btn btn-primary btn-sm">
-                Add New Employee
+                <i class="fas fa-plus"></i> Add New Employee
             </a>
         </div>
     </div>
@@ -22,7 +22,9 @@
             <div class="row">
                 <!-- Employee Name -->
                 <div class="col-md-3 mb-2">
-                    <label class="form-label">Employee Name</label>
+                    <label class="form-label">
+                        <i class="fas fa-user"></i> Employee Name
+                    </label>
                     <input type="text" name="name" class="form-control" 
                            placeholder="Search by name..." 
                            value="{{ request('name') }}">
@@ -30,7 +32,9 @@
 
                 <!-- Email -->
                 <div class="col-md-3 mb-2">
-                    <label class="form-label">Email</label>
+                    <label class="form-label">
+                        <i class="fas fa-envelope"></i> Email
+                    </label>
                     <input type="text" name="email" class="form-control" 
                            placeholder="Search by email..." 
                            value="{{ request('email') }}">
@@ -38,7 +42,9 @@
 
                 <!-- Department -->
                 <div class="col-md-2 mb-2">
-                    <label class="form-label">Department</label>
+                    <label class="form-label">
+                        <i class="fas fa-building"></i> Department
+                    </label>
                     <select name="department_id" class="form-control">
                         <option value="">All Departments</option>
                         @foreach($departments as $department)
@@ -52,7 +58,9 @@
 
                 <!-- Status -->
                 <div class="col-md-2 mb-2">
-                    <label class="form-label">Status</label>
+                    <label class="form-label">
+                        <i class="fas fa-circle"></i> Status
+                    </label>
                     <select name="status" class="form-control">
                         <option value="">All Status</option>
                         <option value="Active" {{ request('status') == 'Active' ? 'selected' : '' }}>Active</option>
@@ -62,30 +70,64 @@
 
                 <!-- Joining Date From -->
                 <div class="col-md-2 mb-2">
-                    <label class="form-label">Joining From</label>
+                    <label class="form-label">
+                        <i class="fas fa-calendar-start"></i> From
+                    </label>
                     <input type="date" name="joining_from" class="form-control" 
                            value="{{ request('joining_from') }}">
                 </div>
 
                 <!-- Joining Date To -->
                 <div class="col-md-2 mb-2">
-                    <label class="form-label">Joining To</label>
+                    <label class="form-label">
+                        <i class="fas fa-calendar-end"></i> To
+                    </label>
                     <input type="date" name="joining_to" class="form-control" 
                            value="{{ request('joining_to') }}">
                 </div>
 
                 <!-- Salary Min -->
                 <div class="col-md-2 mb-2">
-                    <label class="form-label">Salary Min</label>
+                    <label class="form-label">
+                        <i class="fas fa-money-bill"></i> Min
+                    </label>
                     <input type="number" name="salary_min" class="form-control" 
                            placeholder="Min" value="{{ request('salary_min') }}">
                 </div>
 
                 <!-- Salary Max -->
                 <div class="col-md-2 mb-2">
-                    <label class="form-label">Salary Max</label>
+                    <label class="form-label">
+                        <i class="fas fa-money-bill"></i> Max
+                    </label>
                     <input type="number" name="salary_max" class="form-control" 
                            placeholder="Max" value="{{ request('salary_max') }}">
+                </div>
+
+                <!-- Sort By Dropdown -->
+                <div class="col-md-2 mb-2">
+                    <label class="form-label">
+                        <i class="fas fa-sort"></i> Sort By
+                    </label>
+                    <select name="sort_by" class="form-control" onchange="this.form.submit()">
+                        <option value="">Default</option>
+                        <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Name</option>
+                        <option value="email" {{ request('sort_by') == 'email' ? 'selected' : '' }}>Email</option>
+                        <option value="department" {{ request('sort_by') == 'department' ? 'selected' : '' }}>Department</option>
+                        <option value="joining_date" {{ request('sort_by') == 'joining_date' ? 'selected' : '' }}>Joining Date</option>
+                        <option value="status" {{ request('sort_by') == 'status' ? 'selected' : '' }}>Status</option>
+                    </select>
+                </div>
+
+                <!-- Sort Order Dropdown -->
+                <div class="col-md-2 mb-2">
+                    <label class="form-label">
+                        <i class="fas fa-arrow-up-arrow-down"></i> Order
+                    </label>
+                    <select name="sort_order" class="form-control" onchange="this.form.submit()">
+                        <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>▲ Ascending</option>
+                        <option value="desc" {{ request('sort_order') == 'desc' ? 'selected' : '' }}>▼ Descending</option>
+                    </select>
                 </div>
 
                 <!-- Buttons -->
@@ -97,9 +139,10 @@
                         <i class="fas fa-times"></i> Clear All
                     </a>
                     
-                    <!-- Show applied filters -->
-                    @if(request()->anyFilled(['name', 'email', 'department_id', 'status', 'joining_from', 'joining_to', 'salary_min', 'salary_max']))
-                        <span class="badge bg-info ms-2">Filters Applied</span>
+                    @if(request()->anyFilled(['name', 'email', 'department_id', 'status', 'joining_from', 'joining_to', 'salary_min', 'salary_max', 'sort_by', 'sort_order']))
+                        <span class="badge bg-info ms-2">
+                            <i class="fas fa-filter"></i> Filters Applied
+                        </span>
                     @endif
                 </div>
             </div>
@@ -113,14 +156,39 @@
                         <th>#</th>
                         <th>Photo</th>
                         <th>Employee Code</th>
-                        <th>Name</th>
-                        <th>Email</th>
+                        <th>
+                            Name
+                            @if(request('sort_by') == 'name')
+                                <i class="fas fa-sort-{{ request('sort_order') == 'asc' ? 'up' : 'down' }}"></i>
+                            @endif
+                        </th>
+                        <th>
+                            Email
+                            @if(request('sort_by') == 'email')
+                                <i class="fas fa-sort-{{ request('sort_order') == 'asc' ? 'up' : 'down' }}"></i>
+                            @endif
+                        </th>
                         <th>Mobile</th>
-                        <th>Department</th>
+                        <th>
+                            Department
+                            @if(request('sort_by') == 'department')
+                                <i class="fas fa-sort-{{ request('sort_order') == 'asc' ? 'up' : 'down' }}"></i>
+                            @endif
+                        </th>
                         <th>Designation</th>
                         <th>Salary</th>
-                        <th>Joining Date</th>
-                        <th>Status</th>
+                        <th>
+                            Joining Date
+                            @if(request('sort_by') == 'joining_date')
+                                <i class="fas fa-sort-{{ request('sort_order') == 'asc' ? 'up' : 'down' }}"></i>
+                            @endif
+                        </th>
+                        <th>
+                            Status
+                            @if(request('sort_by') == 'status')
+                                <i class="fas fa-sort-{{ request('sort_order') == 'asc' ? 'up' : 'down' }}"></i>
+                            @endif
+                        </th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -169,7 +237,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="12" class="text-center">No employees found</td>
+                        <td colspan="13" class="text-center">No employees found</td>
                     </tr>
                     @endforelse
                 </tbody>
