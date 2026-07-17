@@ -50,15 +50,8 @@
             </table>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                Showing {{ $logs->firstItem() ?? 0 }} to {{ $logs->lastItem() ?? 0 }} 
-                of {{ $logs->total() }} entries
-            </div>
-            <div>
-                {{ $logs->links() }}
-            </div>
-        </div>
+        <!-- ✅ Pagination Component -->
+        <x-pagination :items="$logs" />
     </div>
 </div>
 @endsection

@@ -5,10 +5,10 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5>Employee List</h5>
         <div>
-            <a href="{{ route('employees.export.csv') }}" class="btn btn-success btn-sm me-2">
+            <a href="{{ route('employees.export.csv') }}" class="btn btn-success btn-sm">
                 <i class="fas fa-file-export"></i> Export CSV
             </a>
-            <a href="{{ route('employees.trash') }}" class="btn btn-secondary btn-sm me-2">
+            <a href="{{ route('employees.trash') }}" class="btn btn-secondary btn-sm">
                 <i class="fas fa-trash"></i> Trash
             </a>
             <a href="{{ route('employees.create') }}" class="btn btn-primary btn-sm">
@@ -17,138 +17,82 @@
         </div>
     </div>
     <div class="card-body">
-        <!-- Advanced Search Form -->
+        <!-- Search Form -->
         <form action="{{ route('employees.index') }}" method="GET" class="mb-3">
             <div class="row">
-                <!-- Employee Name -->
-                <div class="col-md-3 mb-2">
-                    <label class="form-label">
-                        <i class="fas fa-user"></i> Employee Name
-                    </label>
-                    <input type="text" name="name" class="form-control" 
-                           placeholder="Search by name..." 
-                           value="{{ request('name') }}">
+                <div class="col-md-3">
+                    <x-input name="name" label="Employee Name" placeholder="Search by name..." value="{{ request('name') }}" />
                 </div>
-
-                <!-- Email -->
-                <div class="col-md-3 mb-2">
-                    <label class="form-label">
-                        <i class="fas fa-envelope"></i> Email
-                    </label>
-                    <input type="text" name="email" class="form-control" 
-                           placeholder="Search by email..." 
-                           value="{{ request('email') }}">
+                <div class="col-md-3">
+                    <x-input name="email" label="Email" placeholder="Search by email..." value="{{ request('email') }}" />
                 </div>
-
-                <!-- Department -->
-                <div class="col-md-2 mb-2">
-                    <label class="form-label">
-                        <i class="fas fa-building"></i> Department
-                    </label>
-                    <select name="department_id" class="form-control">
-                        <option value="">All Departments</option>
-                        @foreach($departments as $department)
-                            <option value="{{ $department->id }}" 
-                                {{ request('department_id') == $department->id ? 'selected' : '' }}>
-                                {{ $department->department_name }}
-                            </option>
-                        @endforeach
-                    </select>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label class="form-label">Department</label>
+                        <select name="department_id" class="form-control">
+                            <option value="">All Departments</option>
+                            @foreach($departments as $department)
+                                <option value="{{ $department->id }}" {{ request('department_id') == $department->id ? 'selected' : '' }}>
+                                    {{ $department->department_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
-
-                <!-- Status -->
-                <div class="col-md-2 mb-2">
-                    <label class="form-label">
-                        <i class="fas fa-circle"></i> Status
-                    </label>
-                    <select name="status" class="form-control">
-                        <option value="">All Status</option>
-                        <option value="Active" {{ request('status') == 'Active' ? 'selected' : '' }}>Active</option>
-                        <option value="Inactive" {{ request('status') == 'Inactive' ? 'selected' : '' }}>Inactive</option>
-                    </select>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-control">
+                            <option value="">All Status</option>
+                            <option value="Active" {{ request('status') == 'Active' ? 'selected' : '' }}>Active</option>
+                            <option value="Inactive" {{ request('status') == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                        </select>
+                    </div>
                 </div>
-
-                <!-- Joining Date From -->
-                <div class="col-md-2 mb-2">
-                    <label class="form-label">
-                        <i class="fas fa-calendar-start"></i> From
-                    </label>
-                    <input type="date" name="joining_from" class="form-control" 
-                           value="{{ request('joining_from') }}">
+                <div class="col-md-2">
+                    <x-input name="joining_from" label="From" type="date" value="{{ request('joining_from') }}" />
                 </div>
-
-                <!-- Joining Date To -->
-                <div class="col-md-2 mb-2">
-                    <label class="form-label">
-                        <i class="fas fa-calendar-end"></i> To
-                    </label>
-                    <input type="date" name="joining_to" class="form-control" 
-                           value="{{ request('joining_to') }}">
+                <div class="col-md-2">
+                    <x-input name="joining_to" label="To" type="date" value="{{ request('joining_to') }}" />
                 </div>
-
-                <!-- Salary Min -->
-                <div class="col-md-2 mb-2">
-                    <label class="form-label">
-                        <i class="fas fa-money-bill"></i> Min
-                    </label>
-                    <input type="number" name="salary_min" class="form-control" 
-                           placeholder="Min" value="{{ request('salary_min') }}">
+                <div class="col-md-2">
+                    <x-input name="salary_min" label="Salary Min" type="number" placeholder="Min" value="{{ request('salary_min') }}" />
                 </div>
-
-                <!-- Salary Max -->
-                <div class="col-md-2 mb-2">
-                    <label class="form-label">
-                        <i class="fas fa-money-bill"></i> Max
-                    </label>
-                    <input type="number" name="salary_max" class="form-control" 
-                           placeholder="Max" value="{{ request('salary_max') }}">
+                <div class="col-md-2">
+                    <x-input name="salary_max" label="Salary Max" type="number" placeholder="Max" value="{{ request('salary_max') }}" />
                 </div>
-
-                <!-- Sort By Dropdown -->
-                <div class="col-md-2 mb-2">
-                    <label class="form-label">
-                        <i class="fas fa-sort"></i> Sort By
-                    </label>
-                    <select name="sort_by" class="form-control" onchange="this.form.submit()">
-                        <option value="">Default</option>
-                        <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Name</option>
-                        <option value="email" {{ request('sort_by') == 'email' ? 'selected' : '' }}>Email</option>
-                        <option value="department" {{ request('sort_by') == 'department' ? 'selected' : '' }}>Department</option>
-                        <option value="joining_date" {{ request('sort_by') == 'joining_date' ? 'selected' : '' }}>Joining Date</option>
-                        <option value="status" {{ request('sort_by') == 'status' ? 'selected' : '' }}>Status</option>
-                    </select>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label class="form-label">Sort By</label>
+                        <select name="sort_by" class="form-control" onchange="this.form.submit()">
+                            <option value="">Default</option>
+                            <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Name</option>
+                            <option value="email" {{ request('sort_by') == 'email' ? 'selected' : '' }}>Email</option>
+                            <option value="department" {{ request('sort_by') == 'department' ? 'selected' : '' }}>Department</option>
+                            <option value="joining_date" {{ request('sort_by') == 'joining_date' ? 'selected' : '' }}>Joining Date</option>
+                            <option value="status" {{ request('sort_by') == 'status' ? 'selected' : '' }}>Status</option>
+                        </select>
+                    </div>
                 </div>
-
-                <!-- Sort Order Dropdown -->
-                <div class="col-md-2 mb-2">
-                    <label class="form-label">
-                        <i class="fas fa-arrow-up-arrow-down"></i> Order
-                    </label>
-                    <select name="sort_order" class="form-control" onchange="this.form.submit()">
-                        <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>▲ Ascending</option>
-                        <option value="desc" {{ request('sort_order') == 'desc' ? 'selected' : '' }}>▼ Descending</option>
-                    </select>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label class="form-label">Order</label>
+                        <select name="sort_order" class="form-control" onchange="this.form.submit()">
+                            <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>▲ Ascending</option>
+                            <option value="desc" {{ request('sort_order') == 'desc' ? 'selected' : '' }}>▼ Descending</option>
+                        </select>
+                    </div>
                 </div>
-
-                <!-- Buttons -->
-                <div class="col-md-12 mb-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search"></i> Search
-                    </button>
+                <div class="col-md-12">
+                    <x-button type="submit" class="btn-primary" text="Search" icon="search" />
                     <a href="{{ route('employees.index') }}" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Clear All
                     </a>
-                    
-                    @if(request()->anyFilled(['name', 'email', 'department_id', 'status', 'joining_from', 'joining_to', 'salary_min', 'salary_max', 'sort_by', 'sort_order']))
-                        <span class="badge bg-info ms-2">
-                            <i class="fas fa-filter"></i> Filters Applied
-                        </span>
-                    @endif
                 </div>
             </div>
         </form>
 
-        <!-- Employee Table -->
+        <!-- ✅ Employee Table - Complete -->
         <div class="table-responsive">
             <table class="table table-striped table-bordered">
                 <thead class="table-dark">
@@ -244,16 +188,8 @@
             </table>
         </div>
 
-        <!-- Pagination -->
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                Showing {{ $employees->firstItem() ?? 0 }} to {{ $employees->lastItem() ?? 0 }} 
-                of {{ $employees->total() }} entries
-            </div>
-            <div>
-                {{ $employees->appends(request()->query())->links() }}
-            </div>
-        </div>
+        <!-- Pagination Component -->
+        <x-pagination :items="$employees" />
     </div>
 </div>
 

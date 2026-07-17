@@ -1,29 +1,44 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
-            </div>
-
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
-            </div>
-
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
-            </div>
-        </div>
+@section('content')
+<div class="card">
+    <div class="card-header">
+        <h5>
+            <i class="fas fa-user"></i> My Profile
+        </h5>
     </div>
-</x-app-layout>
+    <div class="card-body">
+        <form method="POST" action="{{ route('profile.update') }}">
+            @csrf
+            @method('PUT')
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Input Component -->
+                    <x-input name="name" label="Full Name" type="text" :value="auth()->user()->name" required="true" />
+                </div>
+                
+                <div class="col-md-6">
+                    <x-input name="email" label="Email Address" type="email" :value="auth()->user()->email" required="true" />
+                </div>
+                
+                <div class="col-md-6">
+                    <x-input name="password" label="New Password" type="password" placeholder="Leave blank to keep current password" />
+                </div>
+                
+                <div class="col-md-6">
+                    <x-input name="password_confirmation" label="Confirm Password" type="password" placeholder="Confirm new password" />
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <!-- Button Component -->
+                <x-button type="submit" class="btn-primary" text="Update Profile" icon="save" />
+                <a href="{{ route('dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection

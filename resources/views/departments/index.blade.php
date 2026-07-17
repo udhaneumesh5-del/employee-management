@@ -9,7 +9,7 @@
                 <i class="fas fa-trash"></i> Trash
             </a>
             <a href="{{ route('departments.create') }}" class="btn btn-primary btn-sm">
-                Add New Department
+                <i class="fas fa-plus"></i> Add New Department
             </a>
         </div>
     </div>
@@ -39,11 +39,11 @@
                             @endif
                         </td>
                         <td>
-                            <a href="{{ route('departments.edit', $department->id) }}" 
-                               class="btn btn-warning btn-sm">Update</a>
-                            <button type="button" class="btn btn-danger btn-sm" 
-                                    onclick="confirmDelete({{ $department->id }})">
-                                Delete
+                            <a href="{{ route('departments.edit', $department->id) }}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $department->id }})">
+                                <i class="fas fa-trash"></i>
                             </button>
                             <form id="delete-form-{{ $department->id }}" 
                                   action="{{ route('departments.destroy', $department->id) }}" 
@@ -62,15 +62,8 @@
             </table>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                Showing {{ $departments->firstItem() ?? 0 }} to {{ $departments->lastItem() ?? 0 }} 
-                of {{ $departments->total() }} entries
-            </div>
-            <div>
-                {{ $departments->links() }}
-            </div>
-        </div>
+        <!-- Pagination Component -->
+        <x-pagination :items="$departments" />
     </div>
 </div>
 

@@ -1,201 +1,105 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="card shadow-sm">
-    <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">
-            <i class="fas fa-user-edit me-2"></i>Edit Employee
-        </h5>
+<div class="card">
+    <div class="card-header">
+        <h5>Edit Employee</h5>
     </div>
     <div class="card-body">
         <form action="{{ route('employees.update', $employee->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             
-            <div class="row g-3">
+            <div class="row">
                 <div class="col-md-6">
-                    <label for="employee_code" class="form-label fw-semibold">
-                        <i class="fas fa-id-card me-1 text-primary"></i>Employee Code <span class="text-danger">*</span>
-                    </label>
-                    <input type="text" name="employee_code" id="employee_code" 
-                           class="form-control @error('employee_code') is-invalid @enderror" 
-                           value="{{ old('employee_code', $employee->employee_code) }}" required>
-                    @error('employee_code')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <!-- Input Component -->
+                    <x-input name="employee_code" label="Employee Code" type="text" :value="$employee->employee_code" required="true" />
                 </div>
                 
                 <div class="col-md-6">
-                    <label for="email" class="form-label fw-semibold">
-                        <i class="fas fa-envelope me-1 text-primary"></i>Email <span class="text-danger">*</span>
-                    </label>
-                    <input type="email" name="email" id="email" 
-                           class="form-control @error('email') is-invalid @enderror" 
-                           value="{{ old('email', $employee->email) }}" required>
-                    @error('email')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <x-input name="email" label="Email" type="email" :value="$employee->email" required="true" />
                 </div>
                 
                 <div class="col-md-6">
-                    <label for="first_name" class="form-label fw-semibold">
-                        <i class="fas fa-user me-1 text-primary"></i>First Name <span class="text-danger">*</span>
-                    </label>
-                    <input type="text" name="first_name" id="first_name" 
-                           class="form-control @error('first_name') is-invalid @enderror" 
-                           value="{{ old('first_name', $employee->first_name) }}" required>
-                    @error('first_name')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <x-input name="first_name" label="First Name" type="text" :value="$employee->first_name" required="true" />
                 </div>
                 
                 <div class="col-md-6">
-                    <label for="last_name" class="form-label fw-semibold">
-                        <i class="fas fa-user me-1 text-primary"></i>Last Name <span class="text-danger">*</span>
-                    </label>
-                    <input type="text" name="last_name" id="last_name" 
-                           class="form-control @error('last_name') is-invalid @enderror" 
-                           value="{{ old('last_name', $employee->last_name) }}" required>
-                    @error('last_name')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <x-input name="last_name" label="Last Name" type="text" :value="$employee->last_name" required="true" />
                 </div>
                 
                 <div class="col-md-6">
-                    <label for="mobile_number" class="form-label fw-semibold">
-                        <i class="fas fa-phone me-1 text-primary"></i>Mobile Number <span class="text-danger">*</span>
-                    </label>
-                    <input type="text" name="mobile_number" id="mobile_number" 
-                           class="form-control @error('mobile_number') is-invalid @enderror" 
-                           value="{{ old('mobile_number', $employee->mobile_number) }}" required>
-                    @error('mobile_number')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <x-input name="mobile_number" label="Mobile Number" type="text" :value="$employee->mobile_number" required="true" />
                 </div>
                 
                 <div class="col-md-6">
-                    <label for="designation" class="form-label fw-semibold">
-                        <i class="fas fa-briefcase me-1 text-primary"></i>Designation <span class="text-danger">*</span>
-                    </label>
-                    <input type="text" name="designation" id="designation" 
-                           class="form-control @error('designation') is-invalid @enderror" 
-                           value="{{ old('designation', $employee->designation) }}" required>
-                    @error('designation')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <x-input name="designation" label="Designation" type="text" :value="$employee->designation" required="true" />
                 </div>
                 
                 <div class="col-md-6">
-                    <label for="salary" class="form-label fw-semibold">
-                        <i class="fas fa-money-bill-wave me-1 text-primary"></i>Salary <span class="text-danger">*</span>
-                    </label>
-                    <input type="number" step="0.01" name="salary" id="salary" 
-                           class="form-control @error('salary') is-invalid @enderror" 
-                           value="{{ old('salary', $employee->salary) }}" required>
-                    @error('salary')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <x-input name="salary" label="Salary" type="number" :value="$employee->salary" required="true" />
                 </div>
                 
                 <div class="col-md-6">
-                    <label for="joining_date" class="form-label fw-semibold">
-                        <i class="fas fa-calendar-alt me-1 text-primary"></i>Joining Date <span class="text-danger">*</span>
-                    </label>
-                    <input type="date" name="joining_date" id="joining_date" 
-                           class="form-control @error('joining_date') is-invalid @enderror" 
-                           value="{{ old('joining_date', $employee->joining_date) }}" required>
-                    @error('joining_date')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <x-input name="joining_date" label="Joining Date" type="date" :value="$employee->joining_date" required="true" />
                 </div>
                 
-                <!-- Department Dropdown -->
                 <div class="col-md-6">
-                    <label for="department_id" class="form-label fw-semibold">
-                        <i class="fas fa-building me-1 text-primary"></i>Department
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light">
-                            <i class="fas fa-chevron-down text-muted"></i>
-                        </span>
-                        <select name="department_id" id="department_id" 
-                                class="form-select @error('department_id') is-invalid @enderror">
-                            <option value="">-- Select Department --</option>
+                    <div class="mb-3">
+                        <label class="form-label">Status <span class="text-danger">*</span></label>
+                        <select name="status" class="form-control @error('status') is-invalid @enderror" required>
+                            <option value="Active" {{ old('status', $employee->status) == 'Active' ? 'selected' : '' }}>Active</option>
+                            <option value="Inactive" {{ old('status', $employee->status) == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                        </select>
+                        @error('status')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Department</label>
+                        <select name="department_id" class="form-control @error('department_id') is-invalid @enderror">
+                            <option value="">Select Department</option>
                             @foreach($departments as $department)
-                                <option value="{{ $department->id }}" 
-                                    {{ old('department_id', $employee->department_id) == $department->id ? 'selected' : '' }}>
-                                    <i class="fas fa-building me-1"></i>
-                                    {{ $department->department_name }} ({{ $department->department_code }})
+                                <option value="{{ $department->id }}" {{ old('department_id', $employee->department_id) == $department->id ? 'selected' : '' }}>
+                                    {{ $department->department_name }}
                                 </option>
                             @endforeach
                         </select>
+                        @error('department_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                    @error('department_id')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
                 </div>
                 
-                <!-- Status Dropdown -->
                 <div class="col-md-6">
-                    <label for="status" class="form-label fw-semibold">
-                        <i class="fas fa-toggle-on me-1 text-primary"></i>Status <span class="text-danger">*</span>
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light">
-                            <i class="fas fa-chevron-down text-muted"></i>
-                        </span>
-                        <select name="status" id="status" 
-                                class="form-select @error('status') is-invalid @enderror" required>
-                            <option value="">-- Select Status --</option>
-                            <option value="Active" {{ old('status', $employee->status) == 'Active' ? 'selected' : '' }}>
-                                <i class="fas fa-check-circle text-success me-1"></i> Active
-                            </option>
-                            <option value="Inactive" {{ old('status', $employee->status) == 'Inactive' ? 'selected' : '' }}>
-                                <i class="fas fa-times-circle text-danger me-1"></i> Inactive
-                            </option>
-                        </select>
+                    <div class="mb-3">
+                        <label class="form-label">Profile Image</label>
+                        <input type="file" name="profile_image" class="form-control @error('profile_image') is-invalid @enderror" accept="image/*">
+                        @error('profile_image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        
+                        @if($employee->profile_image)
+                            <div class="mt-2">
+                                <img src="{{ $employee->profile_image_url }}" 
+                                     alt="{{ $employee->first_name }}" 
+                                     width="80" height="80" 
+                                     style="border-radius: 50%; object-fit: cover;">
+                                <p class="text-muted small mt-1">Current Image</p>
+                            </div>
+                        @endif
                     </div>
-                    @error('status')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                
-                <!-- Profile Image -->
-                <div class="col-md-6">
-                    <label for="profile_image" class="form-label fw-semibold">
-                        <i class="fas fa-image me-1 text-primary"></i>Profile Image
-                    </label>
-                    <input type="file" name="profile_image" id="profile_image" 
-                           class="form-control @error('profile_image') is-invalid @enderror" 
-                           accept="image/*">
-                    <small class="text-muted">
-                        <i class="fas fa-info-circle me-1"></i>Supported: jpeg, png, jpg, gif (Max: 2MB)
-                    </small>
-                    @error('profile_image')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                    
-                    @if($employee->profile_image)
-                        <div class="mt-2">
-                            <img src="{{ asset('storage/' . $employee->profile_image) }}" 
-                                 alt="{{ $employee->first_name }}" 
-                                 width="80" height="80" 
-                                 class="rounded-circle border border-2 border-primary"
-                                 style="object-fit: cover;">
-                            <p class="text-muted small mt-1">
-                                <i class="fas fa-image me-1"></i>Current Image
-                            </p>
-                        </div>
-                    @endif
                 </div>
             </div>
             
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save me-1"></i> Update Employee
-                </button>
+            <div class="mt-3">
+                <!-- Button Component -->
+                <x-button type="submit" class="btn-primary" text="Update Employee" icon="save" />
                 <a href="{{ route('employees.index') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left me-1"></i> Back
+                    <i class="fas fa-arrow-left"></i> Back
                 </a>
             </div>
         </form>

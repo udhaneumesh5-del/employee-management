@@ -32,17 +32,13 @@
                         <td>{{ date('d-m-Y H:i:s', strtotime($department->deleted_at)) }}</td>
                         <td>
                             <!-- Restore Button -->
-                            <form action="{{ route('departments.restore', $department->id) }}" 
-                                  method="POST" style="display: inline;">
+                            <form action="{{ route('departments.restore', $department->id) }}" method="POST" style="display: inline;">
                                 @csrf
-                                <button type="submit" class="btn btn-success btn-sm">
-                                    <i class="fas fa-undo"></i> Restore
-                                </button>
+                                <x-button type="submit" class="btn-success btn-sm" text="Restore" icon="undo" />
                             </form>
                             
                             <!-- Permanent Delete Button -->
-                            <button type="button" class="btn btn-danger btn-sm" 
-                                    onclick="confirmPermanentDelete({{ $department->id }})">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmPermanentDelete({{ $department->id }})">
                                 <i class="fas fa-trash-alt"></i> Permanent
                             </button>
                             
@@ -66,15 +62,8 @@
             </table>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                Showing {{ $departments->firstItem() ?? 0 }} to {{ $departments->lastItem() ?? 0 }} 
-                of {{ $departments->total() }} entries
-            </div>
-            <div>
-                {{ $departments->links() }}
-            </div>
-        </div>
+        <!-- Pagination Component -->
+        <x-pagination :items="$departments" />
     </div>
 </div>
 

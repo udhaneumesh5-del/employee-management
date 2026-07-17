@@ -43,17 +43,13 @@
                         <td>{{ date('d-m-Y H:i:s', strtotime($employee->deleted_at)) }}</td>
                         <td>
                             <!-- Restore Button -->
-                            <form action="{{ route('employees.restore', $employee->id) }}" 
-                                  method="POST" style="display: inline;">
+                            <form action="{{ route('employees.restore', $employee->id) }}" method="POST" style="display: inline;">
                                 @csrf
-                                <button type="submit" class="btn btn-success btn-sm">
-                                    <i class="fas fa-undo"></i> Restore
-                                </button>
+                                <x-button type="submit" class="btn-success btn-sm" text="Restore" icon="undo" />
                             </form>
                             
                             <!-- Permanent Delete Button -->
-                            <button type="button" class="btn btn-danger btn-sm" 
-                                    onclick="confirmPermanentDelete({{ $employee->id }})">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmPermanentDelete({{ $employee->id }})">
                                 <i class="fas fa-trash-alt"></i> Permanent
                             </button>
                             
@@ -77,16 +73,8 @@
             </table>
         </div>
 
-        <!-- Pagination -->
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                Showing {{ $employees->firstItem() ?? 0 }} to {{ $employees->lastItem() ?? 0 }} 
-                of {{ $employees->total() }} entries
-            </div>
-            <div>
-                {{ $employees->links() }}
-            </div>
-        </div>
+        <!-- Pagination Component -->
+        <x-pagination :items="$employees" />
     </div>
 </div>
 
