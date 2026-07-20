@@ -46,7 +46,7 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Status <span class="text-danger">*</span></label>
-                        <select name="status" class="form-control @error('status') is-invalid @enderror" required>
+                        <select name="status" class="form-select @error('status') is-invalid @enderror" required>
                             <option value="Active">Active</option>
                             <option value="Inactive">Inactive</option>
                         </select>
@@ -59,7 +59,7 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Department</label>
-                        <select name="department_id" class="form-control">
+                        <select name="department_id" class="form-select">
                             <option value="">Select Department</option>
                             @foreach($departments as $department)
                                 <option value="{{ $department->id }}">{{ $department->department_name }}</option>
@@ -71,7 +71,7 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Profile Image</label>
-                        <input type="file" name="profile_image" class="form-control" accept="image/*">
+                        <input type="file" name="profile_image" class="form-select" accept="image/*">
                     </div>
                 </div>
             </div>

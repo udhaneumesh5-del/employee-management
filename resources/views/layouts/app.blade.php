@@ -20,33 +20,52 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
+                    <!-- 1. Dashboard -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
+                        <a class="nav-link {{ request()->routeIs('dashboard') ? 'active fw-bold text-white' : '' }}"
+                           href="{{ route('dashboard') }}">
+                            Dashboard
+                        </a>
                     </li>
                     
-                    <!-- Department - Only Admin can see -->
+                    <!-- 2. Departments - Only Admin -->
                     @auth
                         @if(Auth::user()->isAdmin())
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('departments.index') }}">Departments</a>
+                                <a class="nav-link {{ request()->routeIs('departments.*') ? 'active fw-bold text-white' : '' }}"
+                                   href="{{ route('departments.index') }}">
+                                    Departments
+                                </a>
                             </li>
                         @endif
                     @endauth
                     
-                    <!-- Activity Logs - Only Admin can see -->
+                    <!-- 3. Activity Logs - Only Admin -->
                     @auth
                         @if(Auth::user()->isAdmin())
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('activity-logs.index') }}">
+                                <a class="nav-link {{ request()->routeIs('activity-logs.*') ? 'active fw-bold text-white' : '' }}"
+                                   href="{{ route('activity-logs.index') }}">
                                     <i class="fas fa-history"></i> Activity Logs
                                 </a>
                             </li>
                         @endif
                     @endauth
                     
-                    <!-- Employees - Both Admin and HR can see -->
+                    <!-- 4. Employees - Admin & HR -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('employees.index') }}">Employees</a>
+                        <a class="nav-link {{ request()->routeIs('employees.*') ? 'active fw-bold text-white' : '' }}"
+                           href="{{ route('employees.index') }}">
+                            Employees
+                        </a>
+                    </li>
+
+                    <!-- 5. Attendance -->
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('attendance.*') ? 'active fw-bold text-white' : '' }}"
+                           href="{{ route('attendance.index') }}">
+                            <i class="fas fa-calendar-check"></i> Attendance
+                        </a>
                     </li>
                 </ul>
                 

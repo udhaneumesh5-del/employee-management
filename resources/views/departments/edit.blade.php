@@ -23,7 +23,7 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Status <span class="text-danger">*</span></label>
-                        <select name="status" class="form-control @error('status') is-invalid @enderror" required>
+                        <select name="status" class="form-select @error('status') is-invalid @enderror" required>
                             <option value="Active" {{ old('status', $department->status) == 'Active' ? 'selected' : '' }}>Active</option>
                             <option value="Inactive" {{ old('status', $department->status) == 'Inactive' ? 'selected' : '' }}>Inactive</option>
                         </select>

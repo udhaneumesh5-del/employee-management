@@ -47,7 +47,7 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Status <span class="text-danger">*</span></label>
-                        <select name="status" class="form-control @error('status') is-invalid @enderror" required>
+                        <select name="status" class="form-select @error('status') is-invalid @enderror" required>
                             <option value="Active" {{ old('status', $employee->status) == 'Active' ? 'selected' : '' }}>Active</option>
                             <option value="Inactive" {{ old('status', $employee->status) == 'Inactive' ? 'selected' : '' }}>Inactive</option>
                         </select>
@@ -60,7 +60,7 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Department</label>
-                        <select name="department_id" class="form-control @error('department_id') is-invalid @enderror">
+                    <select name="department_id" class="form-select @error('department_id') is-invalid @enderror">
                             <option value="">Select Department</option>
                             @foreach($departments as $department)
                                 <option value="{{ $department->id }}" {{ old('department_id', $employee->department_id) == $department->id ? 'selected' : '' }}>
@@ -77,7 +77,7 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Profile Image</label>
-                        <input type="file" name="profile_image" class="form-control @error('profile_image') is-invalid @enderror" accept="image/*">
+                        <input type="file" name="profile_image" class="form-select @error('profile_image') is-invalid @enderror" accept="image/*">
                         @error('profile_image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

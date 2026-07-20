@@ -22,7 +22,7 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Status <span class="text-danger">*</span></label>
-                        <select name="status" class="form-control @error('status') is-invalid @enderror" required>
+                        <select name="status" class="form-select @error('status') is-invalid @enderror" required>
                             <option value="Active">Active</option>
                             <option value="Inactive">Inactive</option>
                         </select>

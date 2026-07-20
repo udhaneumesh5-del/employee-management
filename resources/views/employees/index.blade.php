@@ -29,7 +29,7 @@
                 <div class="col-md-2">
                     <div class="mb-3">
                         <label class="form-label">Department</label>
-                        <select name="department_id" class="form-control">
+                        <select name="department_id" class="form-select">
                             <option value="">All Departments</option>
                             @foreach($departments as $department)
                                 <option value="{{ $department->id }}" {{ request('department_id') == $department->id ? 'selected' : '' }}>
@@ -42,7 +42,7 @@
                 <div class="col-md-2">
                     <div class="mb-3">
                         <label class="form-label">Status</label>
-                        <select name="status" class="form-control">
+                        <select name="status" class="form-select">
                             <option value="">All Status</option>
                             <option value="Active" {{ request('status') == 'Active' ? 'selected' : '' }}>Active</option>
                             <option value="Inactive" {{ request('status') == 'Inactive' ? 'selected' : '' }}>Inactive</option>
@@ -64,7 +64,7 @@
                 <div class="col-md-2">
                     <div class="mb-3">
                         <label class="form-label">Sort By</label>
-                        <select name="sort_by" class="form-control" onchange="this.form.submit()">
+                        <select name="sort_by" class="form-select" onchange="this.form.submit()">
                             <option value="">Default</option>
                             <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Name</option>
                             <option value="email" {{ request('sort_by') == 'email' ? 'selected' : '' }}>Email</option>

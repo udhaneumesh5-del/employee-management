@@ -1,59 +1,295 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Day 1: Project Setup & Employee CRUD
+✅ Create Laravel project
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+✅ Employee CRUD operations
 
-## About Laravel
+✅ Pagination (10 records per page)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+✅ Search by Name and Email
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+✅ Success messages & Delete confirmation
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Day 2: Employee Image Upload
+✅ Profile image upload
 
-## Learning Laravel
+✅ Image storage in storage/app/public
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+✅ Display image in listing
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+✅ Replace old image on update
 
-## Laravel Sponsors
+✅ Delete image on employee deletion
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+✅ Default avatar if no image
 
-### Premium Partners
+Day 3: Department Management
+✅ Department CRUD operations
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+✅ Department selection in employee forms
 
-## Contributing
+✅ Employee belongsTo Department
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+✅ Department hasMany Employees
 
-## Code of Conduct
+Day 4: Employee Listing Improvements
+✅ Eager Loading (with())
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+✅ Avoid N+1 Query issues
 
-## Security Vulnerabilities
+✅ Sorting by Name and Joining Date
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Day 5: Dashboard
+✅ Total Employees, Departments
 
-## License
+✅ Active/Inactive Employees
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+✅ Recent Employees table
+
+✅ Clickable cards
+
+Day 6: Authentication
+✅ Laravel Breeze installed
+
+✅ Login/Logout
+
+✅ Protected routes
+
+✅ Redirect unauthenticated users
+
+Day 7: Roles & Middleware
+✅ Admin and HR roles
+
+✅ Admin: Full access
+
+✅ HR: Manage only Employees
+
+✅ Role-based middleware
+
+Day 8: Soft Delete
+✅ Soft delete employees/departments
+
+✅ Trash page
+
+✅ Restore deleted records
+
+✅ Permanently delete
+
+✅ Display deleted date
+
+Day 9: Activity Log
+✅ Log employee activities
+
+✅ Created, Updated, Deleted, Restored
+
+✅ Display activity logs
+
+Day 10: CSV Export
+✅ Export employee list to CSV
+
+✅ Fields: Employee Code, Name, Email, Department, Salary, Joining Date
+
+✅ Filename: employees_YYYY_MM_DD.csv
+
+Day 11: Employee Profile Page
+✅ Display all employee details
+
+✅ Profile image
+
+✅ Created date
+
+Day 12: Advanced Search & Filters
+✅ Filter by Name, Email, Department, Status
+
+✅ Joining Date Range
+
+✅ Salary Range
+
+✅ Multiple filters simultaneously
+
+Day 13: Sorting
+✅ Sort by Name, Email, Joining Date, Status
+
+✅ Ascending/Descending
+
+Day 14: Blade Components
+✅ Input Component
+
+✅ Button Component
+
+✅ Alert Component
+
+✅ Pagination Component
+
+Day 15: Mini Project (Attendance Module)
+✅ Mark attendance (Present/Absent/Leave)
+
+✅ Check In/Out
+
+✅ Today's attendance on dashboard
+
+✅ Filter by Date, Employee, Status
+
+🛠️ Technologies Used
+Technology	Version
+PHP	8.2+
+Laravel	12.x
+MySQL	5.7+
+Bootstrap	5.3
+Font Awesome	6.4
+📁 Project Structure
+text
+employee-management/
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── DashboardController.php
+│   │   ├── EmployeeController.php
+│   │   ├── DepartmentController.php
+│   │   ├── AttendanceController.php
+│   │   └── ActivityLogController.php
+│   ├── Models/
+│   │   ├── User.php
+│   │   ├── Employee.php
+│   │   ├── Department.php
+│   │   ├── Attendance.php
+│   │   └── ActivityLog.php
+│   └── View/Components/
+│       ├── Input.php
+│       ├── Button.php
+│       ├── Alert.php
+│       └── Pagination.php
+├── resources/views/
+│   ├── layouts/app.blade.php
+│   ├── dashboard.blade.php
+│   ├── employees/
+│   ├── departments/
+│   ├── attendance/
+│   └── activity-logs/
+└── routes/web.php
+🚀 Installation
+1. Clone Repository
+bash
+git clone https://github.com/udhaneumesh5-del/employee-management.git
+cd employee-management
+2. Install Dependencies
+bash
+composer install
+npm install
+3. Environment Setup
+bash
+cp .env.example .env
+Update .env with your database credentials:
+
+env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=employee_management
+DB_USERNAME=root
+DB_PASSWORD=
+4. Generate Key
+bash
+php artisan key:generate
+5. Run Migrations
+bash
+php artisan migrate
+6. Create Storage Link
+bash
+php artisan storage:link
+7. Start Server
+bash
+php artisan serve
+🔐 Login Credentials
+Role	Email	Password
+Admin	admin@example.com	password123
+HR	hr@example.com	password123
+📊 Pages & URLs
+Page	URL
+Login	/login
+Dashboard	/dashboard
+Employees	/employees
+Departments	/departments
+Attendance	/attendance
+Activity Logs	/activity-logs
+Profile	/profile
+📋 Deliverables
+Deliverable	Status
+Employee CRUD	✅
+Image Upload	✅
+Department Module	✅
+Dashboard	✅
+Authentication	✅
+Roles & Middleware	✅
+Soft Delete	✅
+Activity Log	✅
+CSV Export	✅
+Profile Page	✅
+Advanced Search	✅
+Sorting	✅
+Blade Components	✅
+Attendance Module	✅
+SQL Export	✅
+Screenshots	✅
+Git Commit History	✅
+🎯 Key Features Summary
+Authentication & Authorization
+Login/Logout
+
+Role-based access (Admin, HR)
+
+Route protection
+
+Employee Management
+CRUD operations
+
+Image upload
+
+Soft delete & restore
+
+Advanced search & filters
+
+Sorting
+
+CSV export
+
+Profile page
+
+Department Management
+CRUD operations
+
+Soft delete & restore
+
+Attendance Management
+Mark attendance
+
+Check In/Out
+
+Filter by date, employee, status
+
+Dashboard
+Employee stats
+
+Today's attendance
+
+Recent employees
+
+Recent attendance
+
+UI/UX
+Bootstrap 5
+
+Blade components
+
+Responsive design
+
+📝 Notes
+Admin has full access to all modules
+
+HR can only manage employees
+
+Activity logs track all employee actions
+
+Soft deleted records can be restored from trash
+
+Images stored in storage/app/public
+
+🎉 Project Complete!

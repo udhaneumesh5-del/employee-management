@@ -27,9 +27,22 @@ class Employee extends Model
 
     protected $dates = ['deleted_at'];
 
+    // Department Relationship
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    // Attendance Relationship
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    // Get today's attendance
+    public function todayAttendance()
+    {
+        return $this->attendances()->whereDate('date', now()->toDateString())->first();
     }
 
     public function getProfileImageUrlAttribute()
