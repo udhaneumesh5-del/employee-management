@@ -60,7 +60,7 @@
     </div>
 </div>
 
-<!-- ✅ Today's Attendance Cards -->
+<!-- Today's Attendance Cards -->
 <div class="row">
     <div class="col-12 mb-3">
         <h5>Today's Attendance ({{ date('d-m-Y') }})</h5>
@@ -102,6 +102,56 @@
     </div>
 </div>
 
+<!-- Asset Stats Cards -->
+<div class="row mt-3">
+    <div class="col-12 mb-3">
+        <h5>Asset Summary</h5>
+    </div>
+    <div class="col-md-3 mb-3">
+        <a href="{{ route('assets.index') }}" class="text-decoration-none">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Assets</h5>
+                    <h2 class="card-text">{{ $totalAssets }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <a href="{{ route('assets.report.issued') }}" class="text-decoration-none">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Issued Assets</h5>
+                    <h2 class="card-text">{{ $issuedAssets }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <a href="{{ route('assets.report.returned') }}" class="text-decoration-none">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Returned Assets</h5>
+                    <h2 class="card-text">{{ $returnedAssets }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <a href="{{ route('assets.report.pending') }}" class="text-decoration-none">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Returns</h5>
+                    <h2 class="card-text">{{ $pendingReturns }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
 <!-- Recent Employees -->
 <div class="card mt-3">
     <div class="card-header">
@@ -137,7 +187,7 @@
     </div>
 </div>
 
-<!-- ✅ Recent Attendance -->
+<!-- Recent Attendance -->
 <div class="card mt-3">
     <div class="card-header">
         <h5>Recent Attendance</h5>
@@ -172,6 +222,47 @@
                     @empty
                     <tr>
                         <td colspan="4" class="text-center">No attendance records found</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Assets -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h5>Recent Asset Assignments</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Employee</th>
+                        <th>Asset Type</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($recentAssets as $asset)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $asset->employee_name }}</td>
+                        <td>{{ $asset->asset_type }}</td>
+                        <td>
+                            @if($asset->status == 'Issued')
+                                <span class="badge bg-warning">Issued</span>
+                            @else
+                                <span class="badge bg-success">Returned</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="text-center">No asset records found</td>
                     </tr>
                     @endforelse
                 </tbody>

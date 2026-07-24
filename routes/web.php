@@ -5,6 +5,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AssetController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -13,7 +14,6 @@ Route::get('/', function () {
 
 Route::middleware(['auth'])->group(function () {
 
-    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Activity Logs - Only Admin
@@ -38,7 +38,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('employees', EmployeeController::class);
     });
 
-    // ✅ Attendance routes - Admin and HR
+    // Attendance routes - Admin and HR
     Route::middleware(['role:Admin,HR'])->group(function () {
         Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
         Route::get('/attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
@@ -47,6 +47,29 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/attendance/{attendance}', [AttendanceController::class, 'update'])->name('attendance.update');
         Route::delete('/attendance/{attendance}', [AttendanceController::class, 'destroy'])->name('attendance.destroy');
         Route::post('/attendance/mark-today', [AttendanceController::class, 'markToday'])->name('attendance.mark-today');
+    });
+
+    // Asset routes - Admin and HR
+    Route::middleware(['role:Admin,HR'])->group(function () {
+        Route::get('/assets', [AssetController::class, 'index'])->name('assets.index');
+        Route::get('/assets/create', [AssetController::class, 'create'])->name('assets.create');
+        Route::post('/assets', [AssetController::class, 'store'])->name('assets.store');
+        Route::get('/assets/{asset}/edit', [AssetController::class, 'edit'])->name('assets.edit');
+        Route::put('/assets/{asset}', [AssetController::class, 'update'])->name('assets.update');
+        Route::delete('/assets/{asset}', [AssetController::class, 'destroy'])->name('assets.destroy');
+
+        // AJAX Route
+        Route::get('/assets/get-employee', [AssetController::class, 'getEmployeeDetails'])->name('assets.get-employee');
+
+        // Asset Reports
+        Route::get('/assets/reports', [AssetController::class, 'reports'])->name('assets.reports');
+        Route::get('/assets/report/all', [AssetController::class, 'allAssetsReport'])->name('assets.report.all');
+        Route::get('/assets/report/issued', [AssetController::class, 'issuedAssetsReport'])->name('assets.report.issued');
+        Route::get('/assets/report/returned', [AssetController::class, 'returnedAssetsReport'])->name('assets.report.returned');
+        Route::get('/assets/report/pending', [AssetController::class, 'pendingReturnsReport'])->name('assets.report.pending');
+
+        // Employee-wise Asset History
+        Route::get('/assets/history', [AssetController::class, 'employeeHistory'])->name('assets.history');
     });
 });
 

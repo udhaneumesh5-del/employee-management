@@ -60,7 +60,15 @@
                         </a>
                     </li>
 
-                    <!-- 5. Attendance -->
+                    <!-- 5. Assets - New item added after Employees -->
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('assets.*') ? 'active fw-bold text-white' : '' }}"
+                           href="{{ route('assets.index') }}">
+                            <i class="fas fa-box"></i> Assets
+                        </a>
+                    </li>
+
+                    <!-- 6. Attendance -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('attendance.*') ? 'active fw-bold text-white' : '' }}"
                            href="{{ route('attendance.index') }}">

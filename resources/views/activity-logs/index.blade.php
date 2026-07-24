@@ -50,7 +50,7 @@
             </table>
         </div>
 
-        <!-- ✅ Pagination Component -->
+        <!--  Pagination Component -->
         <x-pagination :items="$logs" />
     </div>
 </div>
