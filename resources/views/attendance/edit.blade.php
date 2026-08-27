@@ -1,4 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
+
+@section('page-title', 'Edit Attendance')
 
 @section('content')
 <div class="card">
@@ -9,30 +11,29 @@
         <form action="{{ route('attendance.update', $attendance->id) }}" method="POST">
             @csrf
             @method('PUT')
-            
+
             <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="form-label">Employee <span class="text-danger">*</span></label>
-                        <select name="employee_id" class="form-control @error('employee_id') is-invalid @enderror" required>
-                            <option value="">Select Employee</option>
-                            @foreach($employees as $employee)
-                                <option value="{{ $employee->id }}" {{ old('employee_id', $attendance->employee_id) == $employee->id ? 'selected' : '' }}>
-                                    {{ $employee->employee_code }} - {{ $employee->first_name }} {{ $employee->last_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('employee_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                <!--  Only logged-in user's name -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Employee <span class="text-danger">*</span></label>
+                    <select name="employee_id" class="form-control @error('employee_id') is-invalid @enderror" required>
+                        @foreach($employees as $employee)
+                            <option value="{{ $employee->id }}" {{ old('employee_id', $attendance->employee_id) == $employee->id ? 'selected' : '' }}>
+                                {{ $employee->employee_code }} - {{ $employee->first_name }} {{ $employee->last_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <small class="text-muted">You can only edit your own attendance.</small>
+                    @error('employee_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
-                
-                <div class="col-md-6">
+
+                <div class="col-md-6 mb-3">
                     <x-input name="date" label="Date" type="date" :value="old('date', $attendance->date)" required="true" />
                 </div>
-                
-                <div class="col-md-6">
+
+                <div class="col-md-6 mb-3">
                     <div class="mb-3">
                         <label class="form-label">Status <span class="text-danger">*</span></label>
                         <select name="status" class="form-control @error('status') is-invalid @enderror" required>
@@ -45,16 +46,16 @@
                         @enderror
                     </div>
                 </div>
-                
-                <div class="col-md-6">
+
+                <div class="col-md-6 mb-3">
                     <x-input name="check_in" label="Check In Time" type="time" :value="old('check_in', $attendance->check_in)" />
                 </div>
-                
-                <div class="col-md-6">
+
+                <div class="col-md-6 mb-3">
                     <x-input name="check_out" label="Check Out Time" type="time" :value="old('check_out', $attendance->check_out)" />
                 </div>
-                
-                <div class="col-md-12">
+
+                <div class="col-md-12 mb-3">
                     <div class="mb-3">
                         <label class="form-label">Remarks</label>
                         <textarea name="remarks" class="form-control @error('remarks') is-invalid @enderror" rows="2">{{ old('remarks', $attendance->remarks) }}</textarea>
@@ -64,9 +65,11 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="mt-3">
-                <x-button type="submit" class="btn-primary" text="Update Attendance" icon="save" />
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Update Attendance
+                </button>
                 <a href="{{ route('attendance.index') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Back
                 </a>

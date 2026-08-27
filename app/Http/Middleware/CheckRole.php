@@ -8,6 +8,14 @@ use Illuminate\Support\Facades\Auth;
 
 class CheckRole
 {
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  mixed  ...$roles
+     * @return mixed
+     */
     public function handle(Request $request, Closure $next, ...$roles)
     {
         // Check if user is logged in

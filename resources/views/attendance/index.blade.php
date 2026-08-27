@@ -1,42 +1,26 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
+
+@section('page-title', 'My Attendance')
 
 @section('content')
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5>
-            <i class="fas fa-calendar-check"></i> Attendance
-            <span class="badge bg-secondary">{{ now()->format('d-m-Y') }}</span>
-        </h5>
-        <div>
-            <a href="{{ route('attendance.create') }}" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus"></i> Mark Attendance
-            </a>
-        </div>
+        <h5><i class="fas fa-calendar-check"></i> My Attendance</h5>
+        <a href="{{ route('attendance.create') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus"></i> Mark Attendance
+        </a>
     </div>
     <div class="card-body">
-        <!-- Filter Form -->
+        <!-- Filter -->
         <form action="{{ route('attendance.index') }}" method="GET" class="mb-3">
             <div class="row">
                 <div class="col-md-3">
                     <x-input name="date" label="Date" type="date" value="{{ request('date', now()->toDateString()) }}" />
                 </div>
-                <div class="col-md-3">
-                    <div class="mb-3">
-                        <label class="form-label">Employee</label>
-                        <select name="employee_id" class="form-select">
-                            <option value="">All Employees</option>
-                            @foreach($employees as $employee)
-                                <option value="{{ $employee->id }}" {{ request('employee_id') == $employee->id ? 'selected' : '' }}>
-                                    {{ $employee->first_name }} {{ $employee->last_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
                 <div class="col-md-2">
                     <div class="mb-3">
                         <label class="form-label">Status</label>
-                        <select name="status" class="form-select">
+                        <select name="status" class="form-control">
                             <option value="">All</option>
                             <option value="Present" {{ request('status') == 'Present' ? 'selected' : '' }}>Present</option>
                             <option value="Absent" {{ request('status') == 'Absent' ? 'selected' : '' }}>Absent</option>
@@ -45,7 +29,9 @@
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <x-button type="submit" class="btn-primary" text="Filter" icon="search" style="margin-top: 30px;" />
+                    <button type="submit" class="btn btn-primary" style="margin-top: 30px;">
+                        <i class="fas fa-search"></i> Filter
+                    </button>
                     <a href="{{ route('attendance.index') }}" class="btn btn-secondary" style="margin-top: 30px;">
                         <i class="fas fa-times"></i>
                     </a>
@@ -110,7 +96,6 @@
             </table>
         </div>
 
-        <!-- Pagination -->
         <x-pagination :items="$attendances" />
     </div>
 </div>

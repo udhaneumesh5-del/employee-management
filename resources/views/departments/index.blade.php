@@ -1,4 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
+
+@section('page-title', 'Department List')
 
 @section('content')
 <div class="card">

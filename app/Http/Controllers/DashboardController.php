@@ -2,53 +2,100 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Employee;
-use App\Models\Department;
-use App\Models\Attendance;
-use App\Models\Asset;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     public function index()
     {
+        $userRole = auth()->user()->role;
+
         // Employee Stats
-        $totalEmployees = Employee::count();
-        $totalDepartments = Department::count();
-        $activeEmployees = Employee::where('status', 'Active')->count();
-        $inactiveEmployees = Employee::where('status', 'Inactive')->count();
+       
+        $totalEmployees = DB::table('employees')->count();
+        $totalDepartments = DB::table('departments')->count();
+        $activeEmployees = DB::table('employees')->where('status', 'Active')->count();
+        $inactiveEmployees = DB::table('employees')->where('status', 'Inactive')->count();
 
-        // Attendance Stats
+        // Attendance Stats (Today)
+
         $today = now()->toDateString();
-        $todayPresent = Attendance::whereDate('date', $today)->where('status', 'Present')->count();
-        $todayAbsent = Attendance::whereDate('date', $today)->where('status', 'Absent')->count();
-        $todayLeave = Attendance::whereDate('date', $today)->where('status', 'Leave')->count();
-        $todayTotal = Attendance::whereDate('date', $today)->count();
+        $todayPresent = DB::table('attendances')->whereDate('date', $today)->where('status', 'Present')->count();
+        $todayAbsent = DB::table('attendances')->whereDate('date', $today)->where('status', 'Absent')->count();
+        $todayLeave = DB::table('attendances')->whereDate('date', $today)->where('status', 'Leave')->count();
 
-        //  Asset Stats
-        $totalAssets = Asset::count();
-        $issuedAssets = Asset::where('status', 'Issued')->count();
-        $returnedAssets = Asset::where('status', 'Returned')->count();
-        $pendingReturns = Asset::where('status', 'Issued')
-                              ->where('return_date', '<', now())
-                              ->count();
+        // Attendance Summary (This Month)
 
+        $monthStart = now()->startOfMonth()->toDateString();
+        $monthEnd = now()->endOfMonth()->toDateString();
+        $monthPresent = DB::table('attendances')
+            ->whereBetween('date', [$monthStart, $monthEnd])
+            ->where('status', 'Present')
+            ->count();
+        $monthAbsent = DB::table('attendances')
+            ->whereBetween('date', [$monthStart, $monthEnd])
+            ->where('status', 'Absent')
+            ->count();
+        $monthLeave = DB::table('attendances')
+            ->whereBetween('date', [$monthStart, $monthEnd])
+            ->where('status', 'Leave')
+            ->count();
+
+        // Leave Stats
+       
+        $pendingManager = DB::table('leave_requests')
+            ->where('status', 'pending_manager')
+            ->count();
+        $pendingHR = DB::table('leave_requests')
+            ->where('status', 'pending_hr')
+            ->count();
+        $approvedThisMonth = DB::table('leave_requests')
+            ->where('status', 'approved')
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+        $rejectedThisMonth = DB::table('leave_requests')
+            ->whereIn('status', ['manager_rejected', 'hr_rejected'])
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        // Department-wise Employees
+        $departmentWise = DB::table('employees')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->select('departments.department_name', DB::raw('count(*) as total'))
+            ->whereNull('employees.deleted_at')
+            ->groupBy('departments.department_name')
+            ->get();
+
+        // Asset Stats
+        $totalAssets = DB::table('assets_master')->count();
+        $availableAssets = DB::table('assets_master')->where('status', 'Available')->count();
+        $issuedAssets = DB::table('assets_master')->where('status', 'Issued')->count();
+        $returnedAssets = DB::table('asset_returns')->count();
+
+        // Recent Activity 
+        $recentActivity = DB::table('activity_logs')
+            ->orderBy('created_at', 'desc')
+            ->limit(6)
+            ->get();
+
+      
         // Recent Employees
-        $recentEmployees = Employee::with('department')
-                                  ->latest()
-                                  ->take(5)
-                                  ->get();
+    
+        $recentEmployees = DB::table('employees')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->select('employees.*', 'departments.department_name')
+            ->orderBy('employees.created_at', 'desc')
+            ->limit(5)
+            ->get();
 
-        // Recent Attendance
-        $recentAttendance = Attendance::with('employee')
-                                     ->latest()
-                                     ->take(5)
-                                     ->get();
-
-        //  Recent Assets
-        $recentAssets = Asset::latest()->take(5)->get();
+        // Employee Status Counts (For Progress Bars)//
+        $onLeaveToday = $todayLeave;
 
         return view('dashboard', compact(
+            'userRole',
             'totalEmployees',
             'totalDepartments',
             'activeEmployees',
@@ -56,14 +103,21 @@ class DashboardController extends Controller
             'todayPresent',
             'todayAbsent',
             'todayLeave',
-            'todayTotal',
+            'monthPresent',
+            'monthAbsent',
+            'monthLeave',
+            'pendingManager',
+            'pendingHR',
+            'approvedThisMonth',
+            'rejectedThisMonth',
+            'departmentWise',
             'totalAssets',
+            'availableAssets',
             'issuedAssets',
             'returnedAssets',
-            'pendingReturns',
+            'recentActivity',
             'recentEmployees',
-            'recentAttendance',
-            'recentAssets'
+            'onLeaveToday'
         ));
     }
 }

@@ -9,10 +9,22 @@ use Illuminate\Support\Facades\DB;
 
 class AttendanceController extends Controller
 {
-    // Show attendance form
     public function index(Request $request)
     {
+        $user = auth()->user();
+        
+        // Get logged-in user's employee record
+        $employee = Employee::where('email', $user->email)->first();
+        
         $query = Attendance::with('employee');
+
+        // If logged-in user has employee record, filter by that employee only
+        if ($employee) {
+            $query->where('employee_id', $employee->id);
+        } else {
+            // If no employee record found, show empty
+            $query->where('employee_id', 0);
+        }
 
         // Date filter
         if ($request->filled('date')) {
@@ -21,30 +33,31 @@ class AttendanceController extends Controller
             $query->whereDate('date', now()->toDateString());
         }
 
-        // Employee filter
-        if ($request->filled('employee_id')) {
-            $query->where('employee_id', $request->employee_id);
-        }
-
         // Status filter
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         $attendances = $query->paginate(10);
-        $employees = Employee::where('status', 'Active')->get();
+        
+        // Only pass logged-in employee for dropdown
+        $employees = $employee ? collect([$employee]) : collect();
         
         return view('attendance.index', compact('attendances', 'employees'));
     }
 
-    // Show create form
     public function create()
     {
-        $employees = Employee::where('status', 'Active')->get();
+        // Get logged-in user's employee record only
+        $user = auth()->user();
+        $employee = Employee::where('email', $user->email)->first();
+        
+        //  Only pass logged-in employee (if exists)
+        $employees = $employee ? collect([$employee]) : collect();
+        
         return view('attendance.create', compact('employees'));
     }
 
-    // Store attendance
     public function store(Request $request)
     {
         $request->validate([
@@ -56,6 +69,16 @@ class AttendanceController extends Controller
             'remarks' => 'nullable|string'
         ]);
 
+        //  Ensure employee_id belongs to logged-in user
+        $user = auth()->user();
+        $employee = Employee::where('email', $user->email)->first();
+        
+        if (!$employee || $request->employee_id != $employee->id) {
+            return redirect()->back()
+                ->with('error', 'You can only mark attendance for yourself.')
+                ->withInput();
+        }
+
         // Check if attendance already exists
         $exists = Attendance::where('employee_id', $request->employee_id)
                            ->whereDate('date', $request->date)
@@ -63,7 +86,7 @@ class AttendanceController extends Controller
 
         if ($exists) {
             return redirect()->back()
-                ->with('error', 'Attendance already marked for this employee on this date!')
+                ->with('error', 'Attendance already marked for this date!')
                 ->withInput();
         }
 
@@ -73,16 +96,32 @@ class AttendanceController extends Controller
             ->with('success', 'Attendance marked successfully!');
     }
 
-    // Show edit form
     public function edit(Attendance $attendance)
     {
-        $employees = Employee::where('status', 'Active')->get();
+        //  Ensure attendance belongs to logged-in user
+        $user = auth()->user();
+        $employee = Employee::where('email', $user->email)->first();
+        
+        if (!$employee || $attendance->employee_id != $employee->id) {
+            return redirect()->route('attendance.index')
+                ->with('error', 'You can only edit your own attendance.');
+        }
+        
+        $employees = collect([$employee]);
         return view('attendance.edit', compact('attendance', 'employees'));
     }
 
-    // Update attendance
     public function update(Request $request, Attendance $attendance)
     {
+        //  Ensure attendance belongs to logged-in user
+        $user = auth()->user();
+        $employee = Employee::where('email', $user->email)->first();
+        
+        if (!$employee || $attendance->employee_id != $employee->id) {
+            return redirect()->back()
+                ->with('error', 'You can only update your own attendance.');
+        }
+
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'date' => 'required|date',
@@ -98,26 +137,41 @@ class AttendanceController extends Controller
             ->with('success', 'Attendance updated successfully!');
     }
 
-    // Delete attendance
     public function destroy(Attendance $attendance)
     {
+        //  Ensure attendance belongs to logged-in user
+        $user = auth()->user();
+        $employee = Employee::where('email', $user->email)->first();
+        
+        if (!$employee || $attendance->employee_id != $employee->id) {
+            return redirect()->back()
+                ->with('error', 'You can only delete your own attendance.');
+        }
+
         $attendance->delete();
 
         return redirect()->route('attendance.index')
             ->with('success', 'Attendance deleted successfully!');
     }
 
-    // Mark attendance for today (Quick action)
     public function markToday(Request $request)
     {
         $request->validate([
-            'employee_id' => 'required|exists:employees,id',
             'status' => 'required|in:Present,Absent,Leave'
         ]);
 
+        //  Get logged-in user's employee
+        $user = auth()->user();
+        $employee = Employee::where('email', $user->email)->first();
+
+        if (!$employee) {
+            return redirect()->back()
+                ->with('error', 'Employee record not found.');
+        }
+
         $today = now()->toDateString();
 
-        $exists = Attendance::where('employee_id', $request->employee_id)
+        $exists = Attendance::where('employee_id', $employee->id)
                            ->whereDate('date', $today)
                            ->exists();
 
@@ -127,7 +181,7 @@ class AttendanceController extends Controller
         }
 
         Attendance::create([
-            'employee_id' => $request->employee_id,
+            'employee_id' => $employee->id,
             'date' => $today,
             'status' => $request->status,
             'check_in' => $request->status == 'Present' ? now()->format('H:i:s') : null,

@@ -1,9 +1,14 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
+
+@section('page-title', 'Edit Employee')
 
 @section('content')
 <div class="card">
-    <div class="card-header">
-        <h5>Edit Employee</h5>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-user-edit"></i> Edit Employee</h5>
+        <a href="{{ route('employees.index') }}" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
     </div>
     <div class="card-body">
         <form action="{{ route('employees.update', $employee->id) }}" method="POST" enctype="multipart/form-data">
@@ -11,40 +16,47 @@
             @method('PUT')
             
             <div class="row">
-                <div class="col-md-6">
-                    <!-- Input Component -->
-                    <x-input name="employee_code" label="Employee Code" type="text" :value="$employee->employee_code" required="true" />
+                <div class="col-md-6 mb-3">
+                    <x-input name="employee_code" label="Employee Code" type="text" 
+                             :value="old('employee_code', $employee->employee_code)" required="true" />
                 </div>
                 
-                <div class="col-md-6">
-                    <x-input name="email" label="Email" type="email" :value="$employee->email" required="true" />
+                <div class="col-md-6 mb-3">
+                    <x-input name="email" label="Email" type="email" 
+                             :value="old('email', $employee->email)" required="true" />
                 </div>
                 
-                <div class="col-md-6">
-                    <x-input name="first_name" label="First Name" type="text" :value="$employee->first_name" required="true" />
+                <div class="col-md-6 mb-3">
+                    <x-input name="first_name" label="First Name" type="text" 
+                             :value="old('first_name', $employee->first_name)" required="true" />
                 </div>
                 
-                <div class="col-md-6">
-                    <x-input name="last_name" label="Last Name" type="text" :value="$employee->last_name" required="true" />
+                <div class="col-md-6 mb-3">
+                    <x-input name="last_name" label="Last Name" type="text" 
+                             :value="old('last_name', $employee->last_name)" required="true" />
                 </div>
                 
-                <div class="col-md-6">
-                    <x-input name="mobile_number" label="Mobile Number" type="text" :value="$employee->mobile_number" required="true" />
+                <div class="col-md-6 mb-3">
+                    <x-input name="mobile_number" label="Mobile Number" type="text" 
+                             :value="old('mobile_number', $employee->mobile_number)" required="true" />
                 </div>
                 
-                <div class="col-md-6">
-                    <x-input name="designation" label="Designation" type="text" :value="$employee->designation" required="true" />
+                <div class="col-md-6 mb-3">
+                    <x-input name="designation" label="Designation" type="text" 
+                             :value="old('designation', $employee->designation)" required="true" />
                 </div>
                 
-                <div class="col-md-6">
-                    <x-input name="salary" label="Salary" type="number" :value="$employee->salary" required="true" />
+                <div class="col-md-6 mb-3">
+                    <x-input name="salary" label="Salary" type="number" step="0.01"
+                             :value="old('salary', $employee->salary)" required="true" />
                 </div>
                 
-                <div class="col-md-6">
-                    <x-input name="joining_date" label="Joining Date" type="date" :value="$employee->joining_date" required="true" />
+                <div class="col-md-6 mb-3">
+                    <x-input name="joining_date" label="Joining Date" type="date" 
+                             :value="old('joining_date', $employee->joining_date)" required="true" />
                 </div>
                 
-                <div class="col-md-6">
+                <div class="col-md-6 mb-3">
                     <div class="mb-3">
                         <label class="form-label">Status <span class="text-danger">*</span></label>
                         <select name="status" class="form-select @error('status') is-invalid @enderror" required>
@@ -57,13 +69,14 @@
                     </div>
                 </div>
                 
-                <div class="col-md-6">
+                <div class="col-md-6 mb-3">
                     <div class="mb-3">
                         <label class="form-label">Department</label>
-                    <select name="department_id" class="form-select @error('department_id') is-invalid @enderror">
+                        <select name="department_id" class="form-select @error('department_id') is-invalid @enderror">
                             <option value="">Select Department</option>
                             @foreach($departments as $department)
-                                <option value="{{ $department->id }}" {{ old('department_id', $employee->department_id) == $department->id ? 'selected' : '' }}>
+                                <option value="{{ $department->id }}" 
+                                    {{ old('department_id', $employee->department_id) == $department->id ? 'selected' : '' }}>
                                     {{ $department->department_name }}
                                 </option>
                             @endforeach
@@ -73,11 +86,32 @@
                         @enderror
                     </div>
                 </div>
+
+                <!-- ✅ MANAGER DROPDOWN - ADDED -->
+                <div class="col-md-6 mb-3">
+                    <div class="mb-3">
+                        <label class="form-label">Manager</label>
+                        <select name="manager_id" class="form-select @error('manager_id') is-invalid @enderror">
+                            <option value="">Select Manager</option>
+                            @foreach($managers as $manager)
+                                <option value="{{ $manager->id }}" 
+                                    {{ old('manager_id', $employee->manager_id) == $manager->id ? 'selected' : '' }}>
+                                    {{ $manager->first_name }} {{ $manager->last_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Select reporting manager for this employee</small>
+                        @error('manager_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
                 
-                <div class="col-md-6">
+                <div class="col-md-12 mb-3">
                     <div class="mb-3">
                         <label class="form-label">Profile Image</label>
-                        <input type="file" name="profile_image" class="form-select @error('profile_image') is-invalid @enderror" accept="image/*">
+                        <input type="file" name="profile_image" class="form-control @error('profile_image') is-invalid @enderror" accept="image/*">
+                        <small class="text-muted">Supported formats: JPG, PNG, GIF (Max: 2MB)</small>
                         @error('profile_image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -96,10 +130,9 @@
             </div>
             
             <div class="mt-3">
-                <!-- Button Component -->
                 <x-button type="submit" class="btn-primary" text="Update Employee" icon="save" />
                 <a href="{{ route('employees.index') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Back
+                    <i class="fas fa-times"></i> Cancel
                 </a>
             </div>
         </form>

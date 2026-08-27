@@ -1,4 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
+
+@section('page-title', 'Employee List')
 
 @section('content')
 <div class="card">
@@ -92,7 +94,7 @@
             </div>
         </form>
 
-        <!-- ✅ Employee Table - Complete -->
+        <!-- Employee Table -->
         <div class="table-responsive">
             <table class="table table-striped table-bordered">
                 <thead class="table-dark">
