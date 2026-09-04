@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Employee Management System</title>
+    <title>@yield('title', 'Employee Management System')</title>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -13,7 +13,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Custom CSS -->
-  <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    
+    @stack('styles')
 </head>
 <body>
 
@@ -35,7 +37,6 @@
         </div>
 
         <!-- SIDEBAR MENU -->
-       
         <ul class="ems-menu">
             
             <!-- Dashboard -->
@@ -49,7 +50,6 @@
             @auth
                
                 <!-- USER MANAGEMENT - Admin & HR Only -->
-               
                 @if(Auth::user()->isAdmin() || Auth::user()->isHR())
                     <li class="ems-menu-title ems-dropdown">
                         <a href="#" class="ems-dropdown-toggle">
@@ -63,9 +63,7 @@
                     </li>
                 @endif
 
-               
                 <!-- EMPLOYEE MANAGEMENT - All Roles -->
-               
                 <li class="ems-menu-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
                     <a href="{{ route('employees.index') }}">
                         <i class="fas fa-user-group"></i>
@@ -74,9 +72,7 @@
                     </a>
                 </li>
 
-               
                 <!-- DEPARTMENT MANAGEMENT - All Roles -->
-               
                 <li class="ems-menu-item {{ request()->routeIs('departments.*') ? 'active' : '' }}">
                     <a href="{{ route('departments.index') }}">
                         <i class="fas fa-building"></i>
@@ -85,9 +81,7 @@
                     </a>
                 </li>
 
-               
                 <!-- ATTENDANCE MANAGEMENT - All Roles -->
-               
                 <li class="ems-menu-item {{ request()->routeIs('attendance.*') ? 'active' : '' }}">
                     <a href="{{ route('attendance.index') }}">
                         <i class="fas fa-calendar-check"></i>
@@ -96,9 +90,7 @@
                     </a>
                 </li>
 
-               
                 <!-- ASSET MANAGEMENT - Role Based -->
-               
                 @if(Auth::user()->isAdmin() || Auth::user()->isHR() || Auth::user()->isManager() || Auth::user()->isEmployee())
                     <li class="ems-menu-item ems-dropdown">
                         <a href="#" class="ems-dropdown-toggle">
@@ -158,9 +150,7 @@
                     </li>
                 @endif
 
-               
                 <!-- ADMIN ONLY - Leave Management -->
-               
                 @if(Auth::user()->isAdmin())
                     <li class="ems-menu-item ems-dropdown">
                         <a href="#" class="ems-dropdown-toggle">
@@ -181,9 +171,112 @@
                     </li>
                 @endif
 
-               
+                <!-- REIMBURSEMENT MANAGEMENT -->
+                <li class="ems-menu-item ems-dropdown">
+                    <a href="#" class="ems-dropdown-toggle">
+                        <span><i class="fas fa-file-invoice-dollar"></i> Reimbursement</span>
+                        <i class="fas fa-chevron-down ems-arrow"></i>
+                    </a>
+                    <ul class="ems-dropdown-menu">
+                        <!-- Dashboard (All Users) -->
+                        <li class="ems-submenu">
+                            <a href="{{ route('reimbursements.dashboard') }}">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+
+                        <!-- My Requests (Employee, Manager, HR, Admin) -->
+                        @if(Auth::user()->isEmployee() || Auth::user()->isManager() || Auth::user()->isHR())
+                            <li class="ems-submenu">
+                                <a href="{{ route('reimbursements.my-requests') }}">
+                                    <i class="fas fa-list"></i> My Requests
+                                </a>
+                            </li>
+                            <li class="ems-submenu">
+                                <a href="{{ route('reimbursements.create') }}">
+                                    <i class="fas fa-plus"></i> New Request
+                                </a>
+                            </li>
+                        @endif
+
+                        <!-- Manager Pending -->
+                        @if(Auth::user()->isManager())
+                            <li class="ems-divider"></li>
+                            <li class="ems-submenu">
+                                <a href="{{ route('reimbursements.manager.pending') }}">
+                                    <i class="fas fa-clock"></i> Pending Approvals (Manager)
+                                </a>
+                            </li>
+                        @endif
+
+                        <!-- HR Pending -->
+                        @if(Auth::user()->isHR())
+                            <li class="ems-divider"></li>
+                            <li class="ems-submenu">
+                                <a href="{{ route('reimbursements.hr.pending') }}">
+                                    <i class="fas fa-clock"></i> Pending HR
+                                </a>
+                            </li>
+                        @endif
+
+                        <!-- Admin Pending -->
+                        @if(Auth::user()->isAdmin())
+                            <li class="ems-divider"></li>
+                            <li class="ems-submenu">
+                                <a href="{{ route('reimbursements.admin.pending') }}">
+                                    <i class="fas fa-clock"></i> Pending Admin
+                                </a>
+                            </li>
+                        @endif
+
+                        <!-- Policies (HR & Admin) -->
+                        @if(Auth::user()->isHR() || Auth::user()->isAdmin())
+                            <li class="ems-divider"></li>
+                            <li class="ems-submenu">
+                                <a href="{{ route('reimbursements.policies.index') }}">
+                                    <i class="fas fa-gavel"></i> Policies
+                                </a>
+                            </li>
+                            <li class="ems-submenu">
+                                <a href="{{ route('reimbursements.expense-types.index') }}">
+                                    <i class="fas fa-tags"></i> Expense Types
+                                </a>
+                            </li>
+                        @endif
+
+                        <!-- Reports (HR & Admin) -->
+                        @if(Auth::user()->isHR() || Auth::user()->isAdmin())
+                            <li class="ems-divider"></li>
+                            <li class="ems-submenu">
+                                <a href="{{ route('reimbursements.reports.index') }}">
+                                    <i class="fas fa-chart-bar"></i> Reports
+                                </a>
+                            </li>
+                        @endif
+
+                        <!-- Payments (HR & Admin) -->
+                        @if(Auth::user()->isHR() || Auth::user()->isAdmin())
+                            <li class="ems-divider"></li>
+                            <li class="ems-submenu">
+                                <a href="{{ route('reimbursements.payments.index') }}">
+                                    <i class="fas fa-money-bill-wave"></i> Payments
+                                </a>
+                            </li>
+                        @endif
+
+                        <!-- All Requests (Admin only) -->
+                        @if(Auth::user()->isAdmin())
+                            <li class="ems-divider"></li>
+                            <li class="ems-submenu">
+                                <a href="{{ route('reimbursements.all-requests') }}">
+                                    <i class="fas fa-list-ul"></i> All Requests
+                                </a>
+                            </li>
+                        @endif
+                    </ul>
+                </li>
+
                 <!-- ACTIVITY LOGS - Admin & HR -->
-               
                 @if(Auth::user()->isAdmin() || Auth::user()->isHR())
                     <li class="ems-menu-item {{ request()->routeIs('activity-logs.*') ? 'active' : '' }}">
                         <a href="{{ route('activity-logs.index') }}">
@@ -193,9 +286,7 @@
                     </li>
                 @endif
 
-               
                 <!-- REPORTS - All Roles -->
-               
                 <li class="ems-menu-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
                     <a href="{{ route('reports.index') }}">
                         <i class="fas fa-chart-column"></i>
@@ -203,9 +294,7 @@
                     </a>
                 </li>
 
-               
                 <!-- SETTINGS - Admin & HR -->
-               
                 @if(Auth::user()->isAdmin() || Auth::user()->isHR())
                     <li class="ems-menu-item {{ request()->routeIs('settings.*') ? 'active' : '' }}">
                         <a href="{{ route('settings.index') }}">
@@ -221,9 +310,7 @@
     <!-- MAIN CONTENT -->
     <main class="ems-main">
 
-       
         <!-- TOP BAR -->
-       
         <header class="ems-topbar d-flex align-items-center justify-content-between">
             <button class="ems-sidebar-toggle" id="sidebarToggle">
                 <i class="fas fa-bars"></i>
@@ -242,6 +329,9 @@
                             if(isset($pendingHR)) {
                                 $pendingCount += $pendingHR;
                             }
+                            if(isset($pendingAdmin)) {
+                                $pendingCount += $pendingAdmin;
+                            }
                         @endphp
                         @if($pendingCount > 0)
                             <span class="badge bg-danger rounded-circle">{{ $pendingCount }}</span>
@@ -259,7 +349,7 @@
                             <i class="fas fa-chevron-down text-muted"></i>
                         </div>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ route('profile.show') }}"><i class="fas fa-user me-2"></i> Profile</a></li>
                             <li><a class="dropdown-item" href="{{ route('settings.index') }}"><i class="fas fa-cog me-2"></i> Settings</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
@@ -280,15 +370,20 @@
             </div>
         </header>
 
-       
         <!-- PAGE CONTENT -->
-       
         <div class="ems-content">
 
             <!-- Page Header -->
             <div class="page-header d-flex align-items-center justify-content-between mb-4">
                 <div>
                     <h2>@yield('page-title', 'Dashboard')</h2>
+                    @hasSection('breadcrumb')
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                @yield('breadcrumb')
+                            </ol>
+                        </nav>
+                    @endif
                 </div>
                 <div class="date">
                     <i class="far fa-calendar"></i>
@@ -307,6 +402,20 @@
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            @if(session('warning'))
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i> {{ session('warning') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            @if(session('info'))
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="fas fa-info-circle me-2"></i> {{ session('info') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
@@ -336,7 +445,6 @@
     document.addEventListener('DOMContentLoaded', function() {
 
         // Sidebar Toggle (Mobile)
-      
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
         const toggleBtn = document.getElementById('sidebarToggle');
@@ -410,6 +518,17 @@
                     parentLi.classList.add('active');
                 }
             }
+        });
+
+        // Auto-dismiss alerts after 5 seconds
+        const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                const closeBtn = alert.querySelector('.btn-close');
+                if (closeBtn) {
+                    closeBtn.click();
+                }
+            }, 5000);
         });
 
     });

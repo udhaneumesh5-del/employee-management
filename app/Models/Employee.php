@@ -29,7 +29,6 @@ class Employee extends Model
     protected $dates = ['deleted_at'];
     
     // Relationships
-
     /**
      * Get the user associated with the employee.
      * One-to-One relationship with User model
@@ -111,6 +110,122 @@ class Employee extends Model
         return $this->hasMany(AssetReturn::class);
     }
 
+    // Reimbursement Relationships
+    /**
+     * Get all reimbursements requested by this employee.
+     */
+    public function reimbursements()
+    {
+        return $this->hasMany(Reimbursement::class, 'requester_id');
+    }
+
+    /**
+     * Get reimbursements where this employee is the manager approver.
+     */
+    public function managerReimbursements()
+    {
+        return $this->hasMany(Reimbursement::class, 'manager_id');
+    }
+
+    /**
+     * Get reimbursements where this employee is the HR approver.
+     */
+    public function hrReimbursements()
+    {
+        return $this->hasMany(Reimbursement::class, 'hr_id');
+    }
+
+    /**
+     * Get reimbursements where this employee is the Admin approver.
+     */
+    public function adminReimbursements()
+    {
+        return $this->hasMany(Reimbursement::class, 'admin_id');
+    }
+
+    /**
+     * Get reimbursements where this employee is the final approver.
+     */
+    public function finalApprovedReimbursements()
+    {
+        return $this->hasMany(Reimbursement::class, 'final_approver_id');
+    }
+
+    /**
+     * Get reimbursements where this employee processed the payment.
+     */
+    public function paidReimbursements()
+    {
+        return $this->hasMany(Reimbursement::class, 'paid_by');
+    }
+
+    /**
+     * Get pending reimbursements for this employee.
+     */
+    public function pendingReimbursements()
+    {
+        return $this->reimbursements()
+            ->whereIn('status', ['pending_manager', 'pending_hr', 'pending_admin'])
+            ->latest()
+            ->get();
+    }
+
+    /**
+     * Get approved reimbursements for this employee.
+     */
+    public function approvedReimbursements()
+    {
+        return $this->reimbursements()
+            ->where('status', 'approved')
+            ->latest()
+            ->get();
+    }
+
+    /**
+     * Get reimbursements pending for manager approval.
+     */
+    public function pendingManagerApprovals()
+    {
+        return $this->managerReimbursements()
+            ->where('status', 'pending_manager')
+            ->latest()
+            ->get();
+    }
+
+    /**
+     * Get reimbursements pending for HR approval.
+     */
+    public function pendingHrApprovals()
+    {
+        return $this->hrReimbursements()
+            ->where('status', 'pending_hr')
+            ->latest()
+            ->get();
+    }
+
+    /**
+     * Get reimbursements pending for Admin approval.
+     */
+    public function pendingAdminApprovals()
+    {
+        return $this->adminReimbursements()
+            ->where('status', 'pending_admin')
+            ->latest()
+            ->get();
+    }
+
+    /**
+     * Get pending reimbursements for the manager's team.
+     */
+    public function getTeamPendingReimbursements()
+    {
+        $subordinateIds = $this->subordinates()->pluck('id');
+        return Reimbursement::whereIn('requester_id', $subordinateIds)
+            ->where('status', 'pending_manager')
+            ->latest()
+            ->get();
+    }
+
     // Scopes
     /**
      * Scope a query to only include active employees.
@@ -119,6 +234,7 @@ class Employee extends Model
     {
         return $query->where('status', 'Active');
     }
+
     /**
      * Scope a query to only include inactive employees.
      */
@@ -126,6 +242,7 @@ class Employee extends Model
     {
         return $query->where('status', 'Inactive');
     }
+
     /**
      * Scope a query to search employees by name or email.
      */
@@ -138,7 +255,9 @@ class Employee extends Model
               ->orWhere('employee_code', 'LIKE', "%{$search}%");
         });
     }
+
     // Accessors & Mutators
+
     /**
      * Get the employee's profile image URL.
      * Returns stored image or generates avatar from name.
@@ -223,8 +342,27 @@ class Employee extends Model
             ->get();
     }
 
-    // Helper Methods
+    /**
+     * Get total reimbursement amount for this employee.
+     */
+    public function getTotalReimbursementAmountAttribute()
+    {
+        return $this->reimbursements()
+            ->where('status', 'approved')
+            ->sum('amount');
+    }
 
+    /**
+     * Get pending reimbursement amount for this employee.
+     */
+    public function getPendingReimbursementAmountAttribute()
+    {
+        return $this->reimbursements()
+            ->whereIn('status', ['pending_manager', 'pending_hr', 'pending_admin'])
+            ->sum('amount');
+    }
+
+    // Helper Methods
     /**
      * Get today's attendance for the employee.
      */
@@ -410,5 +548,54 @@ class Employee extends Model
             ->where('from_date', '<=', $today)
             ->where('to_date', '>=', $today)
             ->first();
+    }
+
+    // Reimbursement Helper Methods
+    /**
+     * Check if employee has pending reimbursements.
+     */
+    public function hasPendingReimbursements()
+    {
+        return $this->reimbursements()
+            ->whereIn('status', ['pending_manager', 'pending_hr', 'pending_admin'])
+            ->exists();
+    }
+
+    /**
+     * Get reimbursements by status.
+     */
+    public function getReimbursementsByStatus($status)
+    {
+        return $this->reimbursements()
+            ->where('status', $status)
+            ->latest()
+            ->get();
+    }
+
+    /**
+     * Get reimbursements for a specific date range.
+     */
+    public function getReimbursementsInDateRange($fromDate, $toDate)
+    {
+        return $this->reimbursements()
+            ->whereBetween('created_at', [$fromDate, $toDate])
+            ->latest()
+            ->get();
+    }
+
+    /**
+     * Check if employee has reached reimbursement limit (if any).
+     */
+    public function hasReachedReimbursementLimit($limit = null)
+    {
+        if ($limit === null) {
+            return false;
+        }
+        
+        $totalApproved = $this->reimbursements()
+            ->where('status', 'approved')
+            ->sum('amount');
+            
+        return $totalApproved >= $limit;
     }
 }
