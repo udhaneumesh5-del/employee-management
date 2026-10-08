@@ -26,6 +26,8 @@
 
     <!-- SIDEBAR -->
     <aside class="ems-sidebar" id="sidebar">
+        
+        <!-- Logo Section -->
         <div class="ems-logo d-flex align-items-center">
             <div class="logo-icon me-3">
                 <i class="fas fa-users"></i>
@@ -38,7 +40,10 @@
 
         <!-- SIDEBAR MENU -->
         <ul class="ems-menu">
-            
+
+            {{-- = MAIN = --}}
+            <li class="ems-menu-title">MAIN</li>
+
             <!-- Dashboard -->
             <li class="ems-menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <a href="{{ route('dashboard') }}">
@@ -48,235 +53,330 @@
             </li>
 
             @auth
-               
-                <!-- USER MANAGEMENT - Admin & HR Only -->
-                @if(Auth::user()->isAdmin() || Auth::user()->isHR())
-                    <li class="ems-menu-title ems-dropdown">
-                        <a href="#" class="ems-dropdown-toggle">
-                            <span><i class="fas fa-users-cog"></i> User Management</span>
-                            <i class="fas fa-chevron-down ems-arrow"></i>
-                        </a>
-                        <ul class="ems-dropdown-menu">
-                            <li class="ems-submenu"><a href="{{ route('users.index') }}">All Users</a></li>
-                            <li class="ems-submenu"><a href="{{ route('users.create') }}">Add User</a></li>
-                        </ul>
-                    </li>
-                @endif
 
-                <!-- EMPLOYEE MANAGEMENT - All Roles -->
-                <li class="ems-menu-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
-                    <a href="{{ route('employees.index') }}">
-                        <i class="fas fa-user-group"></i>
-                        <span>Employee Management</span>
-                        <i class="fas fa-chevron-right ms-auto"></i>
-                    </a>
-                </li>
+            {{-- = MANAGEMENT = --}}
+            <li class="ems-menu-title">MANAGEMENT</li>
 
-                <!-- DEPARTMENT MANAGEMENT - All Roles -->
-                <li class="ems-menu-item {{ request()->routeIs('departments.*') ? 'active' : '' }}">
-                    <a href="{{ route('departments.index') }}">
-                        <i class="fas fa-building"></i>
-                        <span>Department Management</span>
-                        <i class="fas fa-chevron-right ms-auto"></i>
-                    </a>
-                </li>
-
-                <!-- ATTENDANCE MANAGEMENT - All Roles -->
-                <li class="ems-menu-item {{ request()->routeIs('attendance.*') ? 'active' : '' }}">
-                    <a href="{{ route('attendance.index') }}">
-                        <i class="fas fa-calendar-check"></i>
-                        <span>Attendance Management</span>
-                        <i class="fas fa-chevron-right ms-auto"></i>
-                    </a>
-                </li>
-
-                <!-- ASSET MANAGEMENT - Role Based -->
-                @if(Auth::user()->isAdmin() || Auth::user()->isHR() || Auth::user()->isManager() || Auth::user()->isEmployee())
-                    <li class="ems-menu-item ems-dropdown">
-                        <a href="#" class="ems-dropdown-toggle">
-                            <span><i class="fas fa-briefcase"></i> Asset Management</span>
-                            <i class="fas fa-chevron-down ems-arrow"></i>
-                        </a>
-                        <ul class="ems-dropdown-menu">
-                            @if(Auth::user()->isAdmin() || Auth::user()->isHR())
-                                <li class="ems-submenu"><a href="{{ route('asset-master.index') }}">Asset Master</a></li>
-                                <li class="ems-submenu"><a href="{{ route('asset-issue.index') }}">Issue Asset</a></li>
-                                <li class="ems-submenu"><a href="{{ route('asset-return.index') }}">Return Asset</a></li>
-                                <li class="ems-submenu"><a href="{{ route('asset-issue.report') }}">Issued Report</a></li>
-                                <li class="ems-submenu"><a href="{{ route('asset-return.report') }}">Returned Report</a></li>
-                            @else
-                                <li class="ems-submenu"><a href="{{ route('asset-master.index') }}">My Assets</a></li>
-                            @endif
-                        </ul>
-                    </li>
-                @endif
-
-                <!-- LEAVE MANAGEMENT - Role Based -->
-                <!-- Employee/Manager/HR Options - Hide from Admin -->
-                @if(!Auth::user()->isAdmin())
-                    <li class="ems-menu-item ems-dropdown">
-                        <a href="#" class="ems-dropdown-toggle">
-                            <span><i class="fas fa-calendar-days"></i> Leave Management</span>
-                            <i class="fas fa-chevron-down ems-arrow"></i>
-                        </a>
-                        <ul class="ems-dropdown-menu">
-                            <!-- Employee Options -->
-                            @if(Auth::user()->isEmployee() || Auth::user()->isManager() || Auth::user()->isHR())
-                                <li class="ems-submenu"><a href="{{ route('leave.apply-form') }}">Apply Leave</a></li>
-                                <li class="ems-submenu"><a href="{{ route('leave.my-leaves') }}">My Leaves</a></li>
-                                <li class="ems-submenu"><a href="{{ route('leave.balance') }}">Leave Balance</a></li>
-                            @endif
-
-                            <!-- Manager Options -->
-                            @if(Auth::user()->isManager() || Auth::user()->isAdmin())
-                                <li class="ems-submenu"><a href="{{ route('leave.manager.dashboard') }}">Manager Dashboard</a></li>
-                                <li class="ems-submenu"><a href="{{ route('leave.manager.pending') }}">Pending Requests</a></li>
-                            @endif
-
-                            <!-- HR Options -->
-                            @if(Auth::user()->isHR() || Auth::user()->isAdmin())
-                                <li class="ems-submenu"><a href="{{ route('leave.hr.dashboard') }}">HR Dashboard</a></li>
-                                <li class="ems-submenu"><a href="{{ route('leave.hr.pending') }}">Pending HR</a></li>
-                                <li class="ems-submenu"><a href="{{ route('leave.hr.all') }}">All Requests</a></li>
-                                <li class="ems-submenu"><a href="{{ route('leave-types.index') }}">Leave Types</a></li>
-                            @endif
-
-                            <!-- Admin Options -->
-                            @if(Auth::user()->isAdmin())
-                                <li class="ems-submenu"><a href="{{ route('leave.admin.dashboard') }}">Admin Dashboard</a></li>
-                                <li class="ems-submenu"><a href="{{ route('leave.admin.pending') }}">Pending Admin</a></li>
-                            @endif
-                        </ul>
-                    </li>
-                @endif
-
-                <!-- ADMIN ONLY - Leave Management -->
-                @if(Auth::user()->isAdmin())
-                    <li class="ems-menu-item ems-dropdown">
-                        <a href="#" class="ems-dropdown-toggle">
-                            <span><i class="fas fa-calendar-days"></i> Leave Management</span>
-                            <i class="fas fa-chevron-down ems-arrow"></i>
-                        </a>
-                        <ul class="ems-dropdown-menu">
-                            <!-- Admin Only -->
-                            <li class="ems-submenu"><a href="{{ route('leave.admin.dashboard') }}">Admin Dashboard</a></li>
-                            <li class="ems-submenu"><a href="{{ route('leave.admin.pending') }}">Pending Admin</a></li>
-                            
-                            <!-- Leave Types (Admin) -->
-                            <li class="ems-submenu"><a href="{{ route('leave-types.index') }}">Leave Types</a></li>
-                            
-                            <!-- Leave Balance Management (Admin) -->
-                            <li class="ems-submenu"><a href="{{ route('leave.admin.balances') }}">Leave Balances</a></li>
-                        </ul>
-                    </li>
-                @endif
-
-                <!-- REIMBURSEMENT MANAGEMENT -->
-                <li class="ems-menu-item ems-dropdown">
+            <!-- USER MANAGEMENT - Admin & HR Only -->
+            @if(Auth::user()->isAdmin() || Auth::user()->isHR())
+                <li class="ems-menu-item ems-dropdown {{ request()->routeIs('users.*') ? 'active' : '' }}">
                     <a href="#" class="ems-dropdown-toggle">
-                        <span><i class="fas fa-file-invoice-dollar"></i> Reimbursement</span>
+                        <span><i class="fas fa-users-cog"></i> User Management</span>
                         <i class="fas fa-chevron-down ems-arrow"></i>
                     </a>
                     <ul class="ems-dropdown-menu">
-                        <!-- Dashboard (All Users) -->
                         <li class="ems-submenu">
-                            <a href="{{ route('reimbursements.dashboard') }}">
-                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.index') ? 'active' : '' }}">
+                                <i class="fas fa-list"></i> All Users
                             </a>
                         </li>
+                        <li class="ems-submenu">
+                            <a href="{{ route('users.create') }}" class="{{ request()->routeIs('users.create') ? 'active' : '' }}">
+                                <i class="fas fa-user-plus"></i> Add User
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endif
 
-                        <!-- My Requests (Employee, Manager, HR, Admin) -->
-                        @if(Auth::user()->isEmployee() || Auth::user()->isManager() || Auth::user()->isHR())
-                            <li class="ems-submenu">
-                                <a href="{{ route('reimbursements.my-requests') }}">
-                                    <i class="fas fa-list"></i> My Requests
-                                </a>
-                            </li>
-                            <li class="ems-submenu">
-                                <a href="{{ route('reimbursements.create') }}">
-                                    <i class="fas fa-plus"></i> New Request
-                                </a>
-                            </li>
-                        @endif
+            <!-- EMPLOYEE MANAGEMENT - All Roles -->
+            <li class="ems-menu-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
+                <a href="{{ route('employees.index') }}">
+                    <i class="fas fa-user-group"></i>
+                    <span>Employees</span>
+                    <i class="fas fa-chevron-right ms-auto"></i>
+                </a>
+            </li>
 
-                        <!-- Manager Pending -->
-                        @if(Auth::user()->isManager())
+            <!-- DEPARTMENT MANAGEMENT - All Roles -->
+            <li class="ems-menu-item {{ request()->routeIs('departments.*') ? 'active' : '' }}">
+                <a href="{{ route('departments.index') }}">
+                    <i class="fas fa-building"></i>
+                    <span>Departments</span>
+                    <i class="fas fa-chevron-right ms-auto"></i>
+                </a>
+            </li>
+
+            <!-- ATTENDANCE MANAGEMENT - All Roles -->
+            <li class="ems-menu-item {{ request()->routeIs('attendance.*') ? 'active' : '' }}">
+                <a href="{{ route('attendance.index') }}">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Attendance</span>
+                    <i class="fas fa-chevron-right ms-auto"></i>
+                </a>
+            </li>
+
+            {{-- = MODULES = --}}
+            <li class="ems-menu-title">MODULES</li>
+
+            <!-- ASSET MANAGEMENT -->
+            @if(Auth::user()->isAdmin() || Auth::user()->isHR() || Auth::user()->isManager() || Auth::user()->isEmployee())
+                <li class="ems-menu-item ems-dropdown {{ request()->routeIs('asset-*') ? 'active' : '' }}">
+                    <a href="#" class="ems-dropdown-toggle">
+                        <span><i class="fas fa-briefcase"></i> Assets</span>
+                        <i class="fas fa-chevron-down ems-arrow"></i>
+                    </a>
+                    <ul class="ems-dropdown-menu">
+                        @if(Auth::user()->isAdmin() || Auth::user()->isHR())
+                            <li class="ems-submenu"><a href="{{ route('asset-master.index') }}"><i class="fas fa-box"></i> Asset Master</a></li>
+                            <li class="ems-submenu"><a href="{{ route('asset-issue.index') }}"><i class="fas fa-share"></i> Issue Asset</a></li>
+                            <li class="ems-submenu"><a href="{{ route('asset-return.index') }}"><i class="fas fa-undo"></i> Return Asset</a></li>
                             <li class="ems-divider"></li>
-                            <li class="ems-submenu">
-                                <a href="{{ route('reimbursements.manager.pending') }}">
-                                    <i class="fas fa-clock"></i> Pending Approvals (Manager)
-                                </a>
-                            </li>
-                        @endif
-
-                        <!-- HR Pending -->
-                        @if(Auth::user()->isHR())
-                            <li class="ems-divider"></li>
-                            <li class="ems-submenu">
-                                <a href="{{ route('reimbursements.hr.pending') }}">
-                                    <i class="fas fa-clock"></i> Pending HR
-                                </a>
-                            </li>
-                        @endif
-
-                        <!-- Admin Pending -->
-                        @if(Auth::user()->isAdmin())
-                            <li class="ems-divider"></li>
-                            <li class="ems-submenu">
-                                <a href="{{ route('reimbursements.admin.pending') }}">
-                                    <i class="fas fa-clock"></i> Pending Admin
-                                </a>
-                            </li>
-                        @endif
-
-                        <!-- Policies (HR & Admin) -->
-                        @if(Auth::user()->isHR() || Auth::user()->isAdmin())
-                            <li class="ems-divider"></li>
-                            <li class="ems-submenu">
-                                <a href="{{ route('reimbursements.policies.index') }}">
-                                    <i class="fas fa-gavel"></i> Policies
-                                </a>
-                            </li>
-                            <li class="ems-submenu">
-                                <a href="{{ route('reimbursements.expense-types.index') }}">
-                                    <i class="fas fa-tags"></i> Expense Types
-                                </a>
-                            </li>
-                        @endif
-
-                        <!-- Reports (HR & Admin) -->
-                        @if(Auth::user()->isHR() || Auth::user()->isAdmin())
-                            <li class="ems-divider"></li>
-                            <li class="ems-submenu">
-                                <a href="{{ route('reimbursements.reports.index') }}">
-                                    <i class="fas fa-chart-bar"></i> Reports
-                                </a>
-                            </li>
-                        @endif
-
-                        <!-- Payments (HR & Admin) -->
-                        @if(Auth::user()->isHR() || Auth::user()->isAdmin())
-                            <li class="ems-divider"></li>
-                            <li class="ems-submenu">
-                                <a href="{{ route('reimbursements.payments.index') }}">
-                                    <i class="fas fa-money-bill-wave"></i> Payments
-                                </a>
-                            </li>
-                        @endif
-
-                        <!-- All Requests (Admin only) -->
-                        @if(Auth::user()->isAdmin())
-                            <li class="ems-divider"></li>
-                            <li class="ems-submenu">
-                                <a href="{{ route('reimbursements.all-requests') }}">
-                                    <i class="fas fa-list-ul"></i> All Requests
-                                </a>
-                            </li>
+                            <li class="ems-submenu"><a href="{{ route('asset-issue.report') }}"><i class="fas fa-chart-line"></i> Issued Report</a></li>
+                            <li class="ems-submenu"><a href="{{ route('asset-return.report') }}"><i class="fas fa-chart-line"></i> Returned Report</a></li>
+                        @else
+                            <li class="ems-submenu"><a href="{{ route('asset-master.index') }}"><i class="fas fa-box"></i> My Assets</a></li>
                         @endif
                     </ul>
                 </li>
+            @endif
 
-                <!-- ACTIVITY LOGS - Admin & HR -->
+            <!-- LEAVE MANAGEMENT - Non-Admin -->
+            @if(!Auth::user()->isAdmin())
+                <li class="ems-menu-item ems-dropdown {{ request()->routeIs('leave.*') || request()->routeIs('leave-types.*') ? 'active' : '' }}">
+                    <a href="#" class="ems-dropdown-toggle">
+                        <span><i class="fas fa-calendar-days"></i> Leaves</span>
+                        <i class="fas fa-chevron-down ems-arrow"></i>
+                    </a>
+                    <ul class="ems-dropdown-menu">
+                        @if(Auth::user()->isEmployee() || Auth::user()->isManager() || Auth::user()->isHR())
+                            <li class="ems-submenu"><a href="{{ route('leave.apply-form') }}"><i class="fas fa-plus"></i> Apply Leave</a></li>
+                            <li class="ems-submenu"><a href="{{ route('leave.my-leaves') }}"><i class="fas fa-list"></i> My Leaves</a></li>
+                            <li class="ems-submenu"><a href="{{ route('leave.balance') }}"><i class="fas fa-balance-scale"></i> Leave Balance</a></li>
+                        @endif
+
+                        @if(Auth::user()->isManager())
+                            <li class="ems-divider"></li>
+                            <li class="ems-submenu"><a href="{{ route('leave.manager.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Manager Dashboard</a></li>
+                            <li class="ems-submenu"><a href="{{ route('leave.manager.pending') }}"><i class="fas fa-clock"></i> Pending Requests</a></li>
+                        @endif
+
+                        @if(Auth::user()->isHR())
+                            <li class="ems-divider"></li>
+                            <li class="ems-submenu"><a href="{{ route('leave.hr.dashboard') }}"><i class="fas fa-tachometer-alt"></i> HR Dashboard</a></li>
+                            <li class="ems-submenu"><a href="{{ route('leave.hr.pending') }}"><i class="fas fa-clock"></i> Pending HR</a></li>
+                            <li class="ems-submenu"><a href="{{ route('leave.hr.all') }}"><i class="fas fa-list"></i> All Requests</a></li>
+                            <li class="ems-submenu"><a href="{{ route('leave-types.index') }}"><i class="fas fa-tags"></i> Leave Types</a></li>
+                        @endif
+                    </ul>
+                </li>
+            @endif
+
+            <!-- ADMIN LEAVE MANAGEMENT -->
+            @if(Auth::user()->isAdmin())
+                <li class="ems-menu-item ems-dropdown {{ request()->routeIs('leave.*') || request()->routeIs('leave-types.*') ? 'active' : '' }}">
+                    <a href="#" class="ems-dropdown-toggle">
+                        <span><i class="fas fa-calendar-days"></i> Leaves</span>
+                        <i class="fas fa-chevron-down ems-arrow"></i>
+                    </a>
+                    <ul class="ems-dropdown-menu">
+                        <li class="ems-submenu"><a href="{{ route('leave.admin.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a></li>
+                        <li class="ems-submenu"><a href="{{ route('leave.admin.pending') }}"><i class="fas fa-clock"></i> Pending Approvals</a></li>
+                        <li class="ems-submenu"><a href="{{ route('leave-types.index') }}"><i class="fas fa-tags"></i> Leave Types</a></li>
+                        <li class="ems-submenu"><a href="{{ route('leave.admin.balances') }}"><i class="fas fa-balance-scale"></i> Leave Balances</a></li>
+                    </ul>
+                </li>
+            @endif
+
+            <!-- REIMBURSEMENT MANAGEMENT -->
+            <li class="ems-menu-item ems-dropdown {{ request()->routeIs('reimbursements.*') ? 'active' : '' }}">
+                <a href="#" class="ems-dropdown-toggle">
+                    <span><i class="fas fa-file-invoice-dollar"></i> Reimbursement</span>
+                    <i class="fas fa-chevron-down ems-arrow"></i>
+                </a>
+                <ul class="ems-dropdown-menu">
+                    <li class="ems-submenu">
+                        <a href="{{ route('reimbursements.dashboard') }}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+
+                    @if(Auth::user()->isEmployee() || Auth::user()->isManager() || Auth::user()->isHR())
+                        <li class="ems-submenu">
+                            <a href="{{ route('reimbursements.my-requests') }}">
+                                <i class="fas fa-list"></i> My Requests
+                            </a>
+                        </li>
+                        <li class="ems-submenu">
+                            <a href="{{ route('reimbursements.create') }}">
+                                <i class="fas fa-plus"></i> New Request
+                            </a>
+                        </li>
+                    @endif
+
+                    @if(Auth::user()->isManager())
+                        <li class="ems-divider"></li>
+                        <li class="ems-submenu">
+                            <a href="{{ route('reimbursements.manager.pending') }}">
+                                <i class="fas fa-clock"></i> Pending Approvals
+                            </a>
+                        </li>
+                    @endif
+
+                    @if(Auth::user()->isHR())
+                        <li class="ems-divider"></li>
+                        <li class="ems-submenu">
+                            <a href="{{ route('reimbursements.hr.pending') }}">
+                                <i class="fas fa-clock"></i> Pending HR
+                            </a>
+                        </li>
+                    @endif
+
+                    @if(Auth::user()->isAdmin())
+                        <li class="ems-divider"></li>
+                        <li class="ems-submenu">
+                            <a href="{{ route('reimbursements.admin.pending') }}">
+                                <i class="fas fa-clock"></i> Pending Admin
+                            </a>
+                        </li>
+                    @endif
+
+                    @if(Auth::user()->isHR() || Auth::user()->isAdmin())
+                        <li class="ems-divider"></li>
+                        <li class="ems-submenu">
+                            <a href="{{ route('reimbursements.policies.index') }}">
+                                <i class="fas fa-gavel"></i> Policies
+                            </a>
+                        </li>
+                        <li class="ems-submenu">
+                            <a href="{{ route('reimbursements.expense-types.index') }}">
+                                <i class="fas fa-tags"></i> Expense Types
+                            </a>
+                        </li>
+                        <li class="ems-divider"></li>
+                        <li class="ems-submenu">
+                            <a href="{{ route('reimbursements.reports.index') }}">
+                                <i class="fas fa-chart-bar"></i> Reports
+                            </a>
+                        </li>
+                        <li class="ems-submenu">
+                            <a href="{{ route('reimbursements.payments.index') }}">
+                                <i class="fas fa-money-bill-wave"></i> Payments
+                            </a>
+                        </li>
+                    @endif
+
+                    @if(Auth::user()->isAdmin())
+                        <li class="ems-divider"></li>
+                        <li class="ems-submenu">
+                            <a href="{{ route('reimbursements.all-requests') }}">
+                                <i class="fas fa-list-ul"></i> All Requests
+                            </a>
+                        </li>
+                    @endif
+                </ul>
+            </li>
+            <!-- PAYROLL MANAGEMENT -->
+    <li class="ems-menu-item ems-dropdown {{ request()->routeIs('payroll.*') ? 'active' : '' }}">
+        <a href="#" class="ems-dropdown-toggle">
+            <span>
+                <i class="fas fa-money-check-alt"></i> Payroll
+            </span>
+            <i class="fas fa-chevron-down ems-arrow"></i>
+        </a>
+
+        <ul class="ems-dropdown-menu">
+
+            <!-- Dashboard - All Roles -->
+            <li class="ems-submenu">
+                <a href="{{ route('payroll.dashboard') }}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+
+
+            <!-- My Payroll - Employee / Manager / HR -->
+            @if(Auth::user()->isEmployee() || Auth::user()->isManager() || Auth::user()->isHR())
+                <li class="ems-submenu">
+                    <a href="{{ route('payroll.index') }}">
+                        <i class="fas fa-list"></i> My Payroll
+                    </a>
+                </li>
+            @endif
+
+
+            <!-- HR PAYROLL MANAGEMENT -->
+            @if(Auth::user()->isHR())
+
+                <li class="ems-divider"></li>
+
+                <li class="ems-submenu">
+                    <a href="{{ route('payroll.salary-structure') }}">
+                        <i class="fas fa-cog"></i> Salary Structure
+                    </a>
+                </li>
+
+                <li class="ems-submenu">
+                    <a href="{{ route('payroll.generate') }}">
+                        <i class="fas fa-plus"></i> Generate Payroll
+                    </a>
+                </li>
+
+                <li class="ems-submenu">
+                    <a href="{{ route('payroll.index') }}">
+                        <i class="fas fa-list"></i> All Payrolls
+                    </a>
+                </li>
+
+                <li class="ems-submenu">
+                    <a href="{{ route('payroll.adjustments') }}">
+                        <i class="fas fa-sliders-h"></i> Adjustments
+                    </a>
+                </li>
+
+                <li class="ems-submenu">
+                    <a href="{{ route('payroll.reports') }}">
+                        <i class="fas fa-chart-bar"></i> Reports
+                    </a>
+                </li>
+
+            @endif
+
+
+            <!-- ADMIN - HR PAYROLL MANAGEMENT -->
+            @if(Auth::user()->isAdmin())
+
+                <li class="ems-divider"></li>
+
+                <li class="ems-submenu">
+                    <a href="{{ route('payroll.salary-structure') }}">
+                        <i class="fas fa-cog"></i> Salary Structure
+                    </a>
+                </li>
+
+                <li class="ems-submenu">
+                    <a href="{{ route('payroll.generate') }}">
+                        <i class="fas fa-plus"></i> Generate HR Payroll
+                    </a>
+                </li>
+
+                <li class="ems-submenu">
+                    <a href="{{ route('payroll.index') }}">
+                        <i class="fas fa-list"></i> HR Payrolls
+                    </a>
+                </li>
+
+                <li class="ems-submenu">
+                    <a href="{{ route('payroll.adjustments') }}">
+                        <i class="fas fa-sliders-h"></i> Adjustments
+                    </a>
+                </li>
+
+                <li class="ems-submenu">
+                    <a href="{{ route('payroll.reports') }}">
+                        <i class="fas fa-chart-bar"></i> Reports
+                    </a>
+                </li>
+
+            @endif
+
+        </ul>
+    </li>
+
+                {{-- = SYSTEM = --}}
+                <li class="ems-menu-title">SYSTEM</li>
+
+                <!-- ACTIVITY LOGS -->
                 @if(Auth::user()->isAdmin() || Auth::user()->isHR())
                     <li class="ems-menu-item {{ request()->routeIs('activity-logs.*') ? 'active' : '' }}">
                         <a href="{{ route('activity-logs.index') }}">
@@ -286,7 +386,7 @@
                     </li>
                 @endif
 
-                <!-- REPORTS - All Roles -->
+                <!-- REPORTS -->
                 <li class="ems-menu-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
                     <a href="{{ route('reports.index') }}">
                         <i class="fas fa-chart-column"></i>
@@ -294,7 +394,7 @@
                     </a>
                 </li>
 
-                <!-- SETTINGS - Admin & HR -->
+                <!-- SETTINGS -->
                 @if(Auth::user()->isAdmin() || Auth::user()->isHR())
                     <li class="ems-menu-item {{ request()->routeIs('settings.*') ? 'active' : '' }}">
                         <a href="{{ route('settings.index') }}">
@@ -303,9 +403,10 @@
                         </a>
                     </li>
                 @endif
-            @endauth
-        </ul>
-    </aside>
+
+                @endauth
+            </ul>
+        </aside>
 
     <!-- MAIN CONTENT -->
     <main class="ems-main">
@@ -507,16 +608,36 @@
             }
         });
 
-        // Active Link Highlight
-        const currentUrl = window.location.href;
-
-        document.querySelectorAll('.ems-sidebar .nav-link').forEach(function(link) {
-            if (link.href === currentUrl || link.href === currentUrl + '/') {
-                link.classList.add('active');
-                const parentLi = link.closest('li');
-                if (parentLi) {
-                    parentLi.classList.add('active');
+        // Auto-Open Dropdown if Submenu is Active
+        document.querySelectorAll('.ems-dropdown').forEach(function(dropdown) {
+            const activeSubmenu = dropdown.querySelector('.ems-submenu a.active');
+            if (activeSubmenu) {
+                dropdown.classList.add('open');
+                const arrow = dropdown.querySelector('.ems-arrow');
+                if (arrow) {
+                    arrow.classList.add('rotated');
                 }
+            }
+        });
+
+        // Highlight Active Submenu Link
+        const currentPath = window.location.pathname;
+
+        document.querySelectorAll('.ems-submenu a').forEach(function(link) {
+            try {
+                const linkPath = new URL(link.href).pathname;
+                if (linkPath === currentPath) {
+                    link.classList.add('active');
+                    const parentDropdown = link.closest('.ems-dropdown');
+                    if (parentDropdown) {
+                        parentDropdown.classList.add('open');
+                        const arrow = parentDropdown.querySelector('.ems-arrow');
+                        if (arrow) {
+                            arrow.classList.add('rotated');
+                        }
+                    }
+                }
+            } catch (e) {
             }
         });
 

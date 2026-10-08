@@ -19,6 +19,7 @@ use App\Http\Controllers\ReimbursementController;
 use App\Http\Controllers\ReimbursementPolicyController;
 use App\Http\Controllers\ExpenseTypeController;
 use App\Http\Controllers\ReimbursementReportController;
+use App\Http\Controllers\PayrollController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -226,140 +227,205 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/leave-types/toggle/{id}', [LeaveTypeController::class, 'toggleStatus'])->name('leave-types.toggle');
     });
 
-// ==========================================
-// REIMBURSEMENT MANAGEMENT ROUTES
-// ==========================================
+    // REIMBURSEMENT MANAGEMENT ROUTES
+    Route::middleware(['auth'])->group(function () {
 
-Route::middleware(['auth'])->group(function () {
+        // 1 ALL SPECIFIC ROUTES FIRST
+        // Dashboard
+        Route::get('/reimbursements/dashboard', [ReimbursementController::class, 'dashboard'])
+            ->name('reimbursements.dashboard');
 
-    // 1 ALL SPECIFIC ROUTES FIRST
-    
-    // Dashboard
-    Route::get('/reimbursements/dashboard', [ReimbursementController::class, 'dashboard'])
-        ->name('reimbursements.dashboard');
+        // Create
+        Route::get('/reimbursements/create', [ReimbursementController::class, 'create'])
+            ->name('reimbursements.create');
+        Route::post('/reimbursements', [ReimbursementController::class, 'store'])
+            ->name('reimbursements.store');
 
-    // Create
-    Route::get('/reimbursements/create', [ReimbursementController::class, 'create'])
-        ->name('reimbursements.create');
-    Route::post('/reimbursements', [ReimbursementController::class, 'store'])
-        ->name('reimbursements.store');
+        // My Requests
+        Route::get('/reimbursements/my-requests', [ReimbursementController::class, 'myRequests'])
+            ->name('reimbursements.my-requests');
 
-    // My Requests
-    Route::get('/reimbursements/my-requests', [ReimbursementController::class, 'myRequests'])
-        ->name('reimbursements.my-requests');
+        // All Requests (Admin)
+        Route::get('/reimbursements/all-requests', [ReimbursementController::class, 'allRequests'])
+            ->name('reimbursements.all-requests');
 
-    // All Requests (Admin)
-    Route::get('/reimbursements/all-requests', [ReimbursementController::class, 'allRequests'])
-        ->name('reimbursements.all-requests');
+        // Manager Routes
+        Route::get('/reimbursements/manager/pending', [ReimbursementController::class, 'managerPending'])
+            ->name('reimbursements.manager.pending');
+        Route::post('/reimbursements/manager/approve/{id}', [ReimbursementController::class, 'managerApprove'])
+            ->name('reimbursements.manager.approve');
+        Route::post('/reimbursements/manager/reject/{id}', [ReimbursementController::class, 'managerReject'])
+            ->name('reimbursements.manager.reject');
 
-    // Manager Routes
-    Route::get('/reimbursements/manager/pending', [ReimbursementController::class, 'managerPending'])
-        ->name('reimbursements.manager.pending');
-    Route::post('/reimbursements/manager/approve/{id}', [ReimbursementController::class, 'managerApprove'])
-        ->name('reimbursements.manager.approve');
-    Route::post('/reimbursements/manager/reject/{id}', [ReimbursementController::class, 'managerReject'])
-        ->name('reimbursements.manager.reject');
+        // HR Routes
+        Route::get('/reimbursements/hr/pending', [ReimbursementController::class, 'hrPending'])
+            ->name('reimbursements.hr.pending');
+        Route::post('/reimbursements/hr/approve/{id}', [ReimbursementController::class, 'hrApprove'])
+            ->name('reimbursements.hr.approve');
+        Route::post('/reimbursements/hr/reject/{id}', [ReimbursementController::class, 'hrReject'])
+            ->name('reimbursements.hr.reject');
 
-    // HR Routes
-    Route::get('/reimbursements/hr/pending', [ReimbursementController::class, 'hrPending'])
-        ->name('reimbursements.hr.pending');
-    Route::post('/reimbursements/hr/approve/{id}', [ReimbursementController::class, 'hrApprove'])
-        ->name('reimbursements.hr.approve');
-    Route::post('/reimbursements/hr/reject/{id}', [ReimbursementController::class, 'hrReject'])
-        ->name('reimbursements.hr.reject');
+        // Admin Routes
+        Route::get('/reimbursements/admin/pending', [ReimbursementController::class, 'adminPending'])
+            ->name('reimbursements.admin.pending');
+        Route::post('/reimbursements/admin/approve/{id}', [ReimbursementController::class, 'adminApprove'])
+            ->name('reimbursements.admin.approve');
+        Route::post('/reimbursements/admin/reject/{id}', [ReimbursementController::class, 'adminReject'])
+            ->name('reimbursements.admin.reject');
 
-    // Admin Routes
-    Route::get('/reimbursements/admin/pending', [ReimbursementController::class, 'adminPending'])
-        ->name('reimbursements.admin.pending');
-    Route::post('/reimbursements/admin/approve/{id}', [ReimbursementController::class, 'adminApprove'])
-        ->name('reimbursements.admin.approve');
-    Route::post('/reimbursements/admin/reject/{id}', [ReimbursementController::class, 'adminReject'])
-        ->name('reimbursements.admin.reject');
+        // Payments
+        Route::get('/reimbursements/payments', [ReimbursementController::class, 'payments'])
+            ->name('reimbursements.payments.index');
+        Route::post('/reimbursements/payments/process/{id}', [ReimbursementController::class, 'processPayment'])
+            ->name('reimbursements.payments.process');
 
-    // Payments
-    Route::get('/reimbursements/payments', [ReimbursementController::class, 'payments'])
-        ->name('reimbursements.payments.index');
-    Route::post('/reimbursements/payments/process/{id}', [ReimbursementController::class, 'processPayment'])
-        ->name('reimbursements.payments.process');
+        // 2️ PATTERN ROUTES (Has ID but specific)
+        // Edit
+        Route::get('/reimbursements/{id}/edit', [ReimbursementController::class, 'edit'])
+            ->name('reimbursements.edit');
+        Route::put('/reimbursements/{id}', [ReimbursementController::class, 'update'])
+            ->name('reimbursements.update');
+        Route::delete('/reimbursements/{id}', [ReimbursementController::class, 'cancel'])
+            ->name('reimbursements.cancel');
 
-    // 2️ PATTERN ROUTES (Has ID but specific)
-    
-    // Edit
-    Route::get('/reimbursements/{id}/edit', [ReimbursementController::class, 'edit'])
-        ->name('reimbursements.edit');
-    Route::put('/reimbursements/{id}', [ReimbursementController::class, 'update'])
-        ->name('reimbursements.update');
-    Route::delete('/reimbursements/{id}', [ReimbursementController::class, 'cancel'])
-        ->name('reimbursements.cancel');
+        // 3️ AJAX ROUTES
+        Route::get('/reimbursements/policy/{expenseTypeId}', function ($expenseTypeId) {
+            $policy = App\Models\ReimbursementPolicy::where('expense_type_id', $expenseTypeId)
+                ->where('status', 'Active')
+                ->where('effective_from', '<=', now())
+                ->where(function($q) {
+                    $q->where('effective_to', '>=', now())
+                      ->orWhereNull('effective_to');
+                })
+                ->first();
+            return response()->json(['policy' => $policy]);
+        })->name('reimbursements.policy.info');
 
-  
-    // 3️ AJAX ROUTES
-    
-    Route::get('/reimbursements/policy/{expenseTypeId}', function ($expenseTypeId) {
-        $policy = App\Models\ReimbursementPolicy::where('expense_type_id', $expenseTypeId)
-            ->where('status', 'Active')
-            ->where('effective_from', '<=', now())
-            ->where(function($q) {
-                $q->where('effective_to', '>=', now())
-                  ->orWhereNull('effective_to');
-            })
-            ->first();
-        return response()->json(['policy' => $policy]);
-    })->name('reimbursements.policy.info');
+        // 4️ ADMIN/HR MANAGEMENT ROUTES
+        
+        // Policies
+        Route::middleware(['role:Admin,HR'])->group(function () {
+            Route::get('/reimbursements/policies', [ReimbursementPolicyController::class, 'index'])
+                ->name('reimbursements.policies.index');
+            Route::get('/reimbursements/policies/create', [ReimbursementPolicyController::class, 'create'])
+                ->name('reimbursements.policies.create');
+            Route::post('/reimbursements/policies', [ReimbursementPolicyController::class, 'store'])
+                ->name('reimbursements.policies.store');
+            Route::get('/reimbursements/policies/{id}/edit', [ReimbursementPolicyController::class, 'edit'])
+                ->name('reimbursements.policies.edit');
+            Route::put('/reimbursements/policies/{id}', [ReimbursementPolicyController::class, 'update'])
+                ->name('reimbursements.policies.update');
+            Route::delete('/reimbursements/policies/{id}', [ReimbursementPolicyController::class, 'destroy'])
+                ->name('reimbursements.policies.destroy');
+            Route::post('/reimbursements/policies/toggle/{id}', [ReimbursementPolicyController::class, 'toggleStatus'])
+                ->name('reimbursements.policies.toggle');
+        });
 
-    // 4️ ADMIN/HR MANAGEMENT ROUTES
-    
-    // Policies
-    Route::middleware(['role:Admin,HR'])->group(function () {
-        Route::get('/reimbursements/policies', [ReimbursementPolicyController::class, 'index'])
-            ->name('reimbursements.policies.index');
-        Route::get('/reimbursements/policies/create', [ReimbursementPolicyController::class, 'create'])
-            ->name('reimbursements.policies.create');
-        Route::post('/reimbursements/policies', [ReimbursementPolicyController::class, 'store'])
-            ->name('reimbursements.policies.store');
-        Route::get('/reimbursements/policies/{id}/edit', [ReimbursementPolicyController::class, 'edit'])
-            ->name('reimbursements.policies.edit');
-        Route::put('/reimbursements/policies/{id}', [ReimbursementPolicyController::class, 'update'])
-            ->name('reimbursements.policies.update');
-        Route::delete('/reimbursements/policies/{id}', [ReimbursementPolicyController::class, 'destroy'])
-            ->name('reimbursements.policies.destroy');
-        Route::post('/reimbursements/policies/toggle/{id}', [ReimbursementPolicyController::class, 'toggleStatus'])
-            ->name('reimbursements.policies.toggle');
+        // Expense Types
+        Route::middleware(['role:Admin,HR'])->group(function () {
+            Route::get('/reimbursements/expense-types', [ExpenseTypeController::class, 'index'])
+                ->name('reimbursements.expense-types.index');
+            Route::get('/reimbursements/expense-types/create', [ExpenseTypeController::class, 'create'])
+                ->name('reimbursements.expense-types.create');
+            Route::post('/reimbursements/expense-types', [ExpenseTypeController::class, 'store'])
+                ->name('reimbursements.expense-types.store');
+            Route::get('/reimbursements/expense-types/{id}/edit', [ExpenseTypeController::class, 'edit'])
+                ->name('reimbursements.expense-types.edit');
+            Route::put('/reimbursements/expense-types/{id}', [ExpenseTypeController::class, 'update'])
+                ->name('reimbursements.expense-types.update');
+            Route::delete('/reimbursements/expense-types/{id}', [ExpenseTypeController::class, 'destroy'])
+                ->name('reimbursements.expense-types.destroy');
+            Route::post('/reimbursements/expense-types/toggle/{id}', [ExpenseTypeController::class, 'toggleStatus'])
+                ->name('reimbursements.expense-types.toggle');
+        });
+
+        // Reports
+        Route::middleware(['role:Admin,HR'])->group(function () {
+            Route::get('/reimbursements/reports', [ReimbursementReportController::class, 'index'])
+                ->name('reimbursements.reports.index');
+            Route::get('/reimbursements/reports/export-csv', [ReimbursementReportController::class, 'exportCSV'])
+                ->name('reimbursements.reports.export-csv');
+            Route::get('/reimbursements/reports/export-pdf', [ReimbursementReportController::class, 'exportPDF'])
+                ->name('reimbursements.reports.export-pdf');
+        });
+
+        // 5️ WILDCARD ROUTE - ABSOLUTELY LAST
+        // Show (Wildcard) - MUST be LAST
+        Route::get('/reimbursements/{id}', [ReimbursementController::class, 'show'])
+            ->name('reimbursements.show');
     });
 
-    // Expense Types
-    Route::middleware(['role:Admin,HR'])->group(function () {
-        Route::get('/reimbursements/expense-types', [ExpenseTypeController::class, 'index'])
-            ->name('reimbursements.expense-types.index');
-        Route::get('/reimbursements/expense-types/create', [ExpenseTypeController::class, 'create'])
-            ->name('reimbursements.expense-types.create');
-        Route::post('/reimbursements/expense-types', [ExpenseTypeController::class, 'store'])
-            ->name('reimbursements.expense-types.store');
-        Route::get('/reimbursements/expense-types/{id}/edit', [ExpenseTypeController::class, 'edit'])
-            ->name('reimbursements.expense-types.edit');
-        Route::put('/reimbursements/expense-types/{id}', [ExpenseTypeController::class, 'update'])
-            ->name('reimbursements.expense-types.update');
-        Route::delete('/reimbursements/expense-types/{id}', [ExpenseTypeController::class, 'destroy'])
-            ->name('reimbursements.expense-types.destroy');
-        Route::post('/reimbursements/expense-types/toggle/{id}', [ExpenseTypeController::class, 'toggleStatus'])
-            ->name('reimbursements.expense-types.toggle');
-    });
+    // PAYROLL MANAGEMENT ROUTES
+    Route::middleware(['auth'])->group(function () {
 
-    // Reports
-    Route::middleware(['role:Admin,HR'])->group(function () {
-        Route::get('/reimbursements/reports', [ReimbursementReportController::class, 'index'])
-            ->name('reimbursements.reports.index');
-        Route::get('/reimbursements/reports/export-csv', [ReimbursementReportController::class, 'exportCSV'])
-            ->name('reimbursements.reports.export-csv');
-        Route::get('/reimbursements/reports/export-pdf', [ReimbursementReportController::class, 'exportPDF'])
-            ->name('reimbursements.reports.export-pdf');
-    });
+        
+        // Dashboard (All roles)
+        Route::get('/payroll/dashboard', [PayrollController::class, 'dashboard'])
+            ->name('payroll.dashboard');
 
-    // 5️ WILDCARD ROUTE - ABSOLUTELY LAST
-    // Show (Wildcard) - MUST BE LAST
-    Route::get('/reimbursements/{id}', [ReimbursementController::class, 'show'])
-        ->name('reimbursements.show');
-});
+        // ADMIN & HR - Management Routes
+        Route::middleware(['role:Admin,HR'])->group(function () {
+            
+            // Salary Structure (List, Store, Edit, Update)
+            Route::get('/payroll/salary-structure', [PayrollController::class, 'salaryStructure'])
+                ->name('payroll.salary-structure');
+            Route::post('/payroll/salary-structure', [PayrollController::class, 'storeSalaryStructure'])
+                ->name('payroll.salary-structure.store');
+            Route::get('/payroll/salary-structure/{id}/edit', [PayrollController::class, 'editSalaryStructure'])
+                ->name('payroll.salary-structure.edit');
+            Route::put('/payroll/salary-structure/{id}', [PayrollController::class, 'updateSalaryStructure'])
+                ->name('payroll.salary-structure.update');
+
+            // Generate Payroll
+            Route::get('/payroll/generate', [PayrollController::class, 'generate'])
+                ->name('payroll.generate');
+            Route::post('/payroll/generate', [PayrollController::class, 'processGenerate'])
+                ->name('payroll.process-generate');
+
+            // Approve / Process / Mark Paid
+            Route::post('/payroll/approve/{id}', [PayrollController::class, 'approve'])
+                ->name('payroll.approve');
+            Route::post('/payroll/process/{id}', [PayrollController::class, 'process'])
+                ->name('payroll.process');
+            Route::post('/payroll/mark-paid/{id}', [PayrollController::class, 'markPaid'])
+                ->name('payroll.mark-paid');
+
+            // Adjustments
+            Route::get('/payroll/adjustments', [PayrollController::class, 'adjustments'])
+                ->name('payroll.adjustments');
+            Route::post('/payroll/adjustments', [PayrollController::class, 'addAdjustment'])
+                ->name('payroll.adjustments.store');
+
+            // REPORTS (Admin & HR)
+            Route::get('/payroll/reports', [PayrollController::class, 'reports'])
+                ->name('payroll.reports');
+            Route::get('/payroll/reports/export-csv', [PayrollController::class, 'exportCSV'])
+                ->name('payroll.reports.export-csv');
+            
+            // NEW: PDF Export Route
+            Route::get('/payroll/reports/export-pdf', [PayrollController::class, 'exportPDF'])
+                ->name('payroll.reports.export-pdf');
+        });
+
+        // ALL ROLES - View Payroll List
+        Route::get('/payroll', [PayrollController::class, 'index'])
+            ->name('payroll.index');
+
+        // PAYSLIP ROUTES (All roles - own only)
+        // Must come BEFORE /payroll/{id} wildcard
+        
+        // View Payslip (HTML)
+        Route::get('/payroll/payslip/{id}', [PayrollController::class, 'payslip'])
+            ->name('payroll.payslip');
+        
+        // NEW: Download Payslip PDF
+        Route::get('/payroll/payslip/{id}/download', [PayrollController::class, 'downloadPayslipPDF'])
+            ->name('payroll.payslip.download');
+
+        // Show Payroll Details (Wildcard - MUST be LAST)
+        Route::get('/payroll/{id}', [PayrollController::class, 'show'])
+            ->name('payroll.show');
+    });
 
     // REPORT ROUTES
     Route::middleware(['role:Admin,HR,Manager,Employee'])->group(function () {

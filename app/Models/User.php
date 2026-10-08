@@ -33,7 +33,6 @@ class User extends Authenticatable
     }
 
     // Role Check Methods
-    
     public function isAdmin()
     {
         return $this->role === 'Admin';
@@ -55,14 +54,17 @@ class User extends Authenticatable
     }
 
     // Relationships
-    
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'employee_id');
     }
 
+    public function payrolls()
+    {
+        return $this->hasMany(Payroll::class, 'employee_id', 'employee_id');
+    }
+
     // Permission Methods - User Management
-    
     public function canManageUsers()
     {
         return in_array($this->role, ['Admin', 'HR']);
@@ -88,9 +90,6 @@ class User extends Authenticatable
         return $this->role === 'Admin';
     }
 
-    /**
-     * Get allowed roles for creation
-     */
     public function getAllowedRolesToCreate()
     {
         if ($this->isAdmin()) {
@@ -101,22 +100,16 @@ class User extends Authenticatable
         return [];
     }
 
-    /**
-     * Check if user can manage another specific user
-     */
     public function canManageUser($targetUser)
     {
-        // Admin can manage everyone
         if ($this->isAdmin()) {
             return true;
         }
 
-        // HR cannot manage Admin
         if ($this->isHR() && $targetUser->isAdmin()) {
             return false;
         }
 
-        // HR can manage Manager and Employee
         if ($this->isHR() && ($targetUser->isManager() || $targetUser->isEmployee())) {
             return true;
         }
@@ -124,22 +117,16 @@ class User extends Authenticatable
         return false;
     }
 
-    /**
-     * Check if user can delete another specific user
-     */
     public function canDeleteUser($targetUser)
     {
-        // Admin can delete everyone
         if ($this->isAdmin()) {
             return true;
         }
 
-        // HR cannot delete Admin
         if ($this->isHR() && $targetUser->isAdmin()) {
             return false;
         }
 
-        // HR can delete Manager and Employee
         if ($this->isHR() && ($targetUser->isManager() || $targetUser->isEmployee())) {
             return true;
         }
@@ -148,7 +135,6 @@ class User extends Authenticatable
     }
 
     // Permission Methods - Employee Management
-    
     public function canManageEmployees()
     {
         return in_array($this->role, ['Admin', 'HR']);
@@ -176,7 +162,6 @@ class User extends Authenticatable
     }
 
     // Permission Methods - Attendance Management
-    
     public function canManageAttendance()
     {
         return in_array($this->role, ['Admin', 'HR']);
@@ -193,7 +178,6 @@ class User extends Authenticatable
     }
 
     // Permission Methods - Asset Management
-    
     public function canManageAssets()
     {
         return in_array($this->role, ['Admin', 'HR']);
@@ -208,9 +192,9 @@ class User extends Authenticatable
     {
         return $this->role === 'Employee';
     }
-
-    // Permission Methods - Leave Management
     
+    // Permission Methods - Leave Management
+
     public function canManageAllLeaves()
     {
         return in_array($this->role, ['Admin', 'HR']);
@@ -227,7 +211,6 @@ class User extends Authenticatable
     }
 
     // Permission Methods - Activity Logs
-    
     public function canViewActivityLogs()
     {
         return in_array($this->role, ['Admin', 'HR']);
@@ -239,7 +222,6 @@ class User extends Authenticatable
     }
 
     // Permission Methods - Reports
-    
     public function canViewReports()
     {
         return in_array($this->role, ['Admin', 'HR', 'Manager', 'Employee']);
@@ -256,7 +238,6 @@ class User extends Authenticatable
     }
 
     // Permission Methods - Settings
-    
     public function canManageSettings()
     {
         return in_array($this->role, ['Admin', 'HR']);
@@ -273,18 +254,11 @@ class User extends Authenticatable
     }
 
     // Permission Methods - Reimbursement
-
-    /**
-     * Check if user can create reimbursement
-     */
     public function canCreateReimbursement()
     {
-        return in_array($this->role, ['Employee', 'Manager', 'HR', 'Admin']);
+        return in_array($this->role, ['Employee', 'Manager', 'HR']);
     }
 
-    /**
-     * Check if user can approve reimbursement
-     */
     public function canApproveReimbursement($reimbursement)
     {
         if ($this->isEmployee()) {
@@ -292,19 +266,16 @@ class User extends Authenticatable
         }
 
         if ($this->isManager()) {
-            // Manager can approve if request is pending_manager and belongs to their team
             return $reimbursement->status === 'pending_manager' && 
-                   $reimbursement->manager_id === $this->employee->id;
+                   $reimbursement->manager_id === $this->employee?->id;
         }
 
         if ($this->isHR()) {
-            // HR can approve if request is pending_hr
             return $reimbursement->status === 'pending_hr' &&
-                   $reimbursement->requester_id !== $this->employee->id;
+                   $reimbursement->requester_id !== $this->employee?->id;
         }
 
         if ($this->isAdmin()) {
-            // Admin can approve if request is pending_admin (HR requests)
             return $reimbursement->status === 'pending_admin' &&
                    $reimbursement->requester_role === 'HR';
         }
@@ -312,40 +283,271 @@ class User extends Authenticatable
         return false;
     }
 
-    /**
-     * Check if user can manage policies
-     */
     public function canManagePolicies()
     {
         return in_array($this->role, ['Admin', 'HR']);
     }
 
-    /**
-     * Check if user can manage expense types
-     */
     public function canManageExpenseTypes()
     {
         return in_array($this->role, ['Admin', 'HR']);
     }
 
-    /**
-     * Check if user can view reimbursement reports
-     */
     public function canViewReimbursementReports()
     {
         return in_array($this->role, ['Admin', 'HR']);
     }
 
-    /**
-     * Check if user can manage payments
-     */
     public function canManagePayments()
     {
         return in_array($this->role, ['Admin', 'HR']);
     }
+    // Permission Methods - Payroll Management
+    /**
+     * Check if user can manage payroll
+     * HR can manage Employee/Manager payroll, Admin can manage HR payroll
+     */
+    public function canManagePayroll()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     * FIXED: Check if user can process specific employee's payroll
+     * 
+     * HR → Employee + Manager payroll
+     * Admin → HR payroll only
+     */
+    public function canProcessPayroll($payroll)
+    {
+        // Get the employee's user account role from users table
+        $employeeUser = self::where('employee_id', $payroll->employee_id)->first();
+        $employeeRole = $employeeUser->role ?? 'Employee';
+
+        // HR can process Employee and Manager payroll
+        if ($this->isHR()) {
+            return in_array($employeeRole, ['Employee', 'Manager']);
+        }
+
+        // Admin can process HR payroll only
+        if ($this->isAdmin()) {
+            return $employeeRole === 'HR';
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if user can view own payslip
+     */
+    public function canViewOwnPayslip()
+    {
+        return in_array($this->role, ['Employee', 'Manager', 'HR']);
+    }
+
+    /**
+     * Check if user can view all payrolls
+     */
+    public function canViewAllPayrolls()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     * Check if user can view team payrolls
+     */
+    public function canViewTeamPayrolls()
+    {
+        return $this->role === 'Manager';
+    }
+
+    /**
+     * Check if user can process payroll (generate monthly payroll)
+     */
+    public function canProcessPayrollBatch()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     * Check if user can approve payroll
+     */
+    public function canApprovePayroll()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     * Check if user can delete payroll
+     */
+    public function canDeletePayroll()
+    {
+        return $this->role === 'Admin';
+    }
+
+    /**
+     * Check if user can manage salary structures
+     */
+    public function canManageSalaryStructures()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     * Check if user can view salary structures
+     */
+    public function canViewSalaryStructures()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     * Check if user can manage employee loans
+     */
+    public function canManageLoans()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     * Check if user can approve loans
+     */
+    public function canApproveLoans()
+    {
+        return $this->role === 'Admin';
+    }
+
+    /**
+     * Check if user can process loan EMI deductions
+     */
+    public function canProcessLoanDeductions()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     * Check if user can manage salary increments
+     */
+    public function canManageSalaryIncrements()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     * Check if user can view payroll reports
+     */
+    public function canViewPayrollReports()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     * Check if user can export bank file
+     */
+    public function canExportBankFile()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     * Check if user can download Form 16
+     */
+    public function canDownloadForm16()
+    {
+        return in_array($this->role, ['Admin', 'HR', 'Manager', 'Employee']);
+    }
+
+    /**
+     * Check if user can mark payroll as paid
+     */
+    public function canMarkPayrollAsPaid()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     * Check if user can view payroll dashboard
+     */
+    public function canViewPayrollDashboard()
+    {
+        return in_array($this->role, ['Admin', 'HR', 'Manager', 'Employee']);
+    }
+
+    /**
+     * NEW: Check if user can manage payroll adjustments
+     */
+    public function canManagePayrollAdjustments()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     * NEW: Check if user can view payroll reports (alias)
+     */
+    public function canViewPayrollReport()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     *  NEW: Check if user can edit salary structure
+     */
+    public function canEditSalaryStructure()
+    {
+        return in_array($this->role, ['Admin', 'HR']);
+    }
+
+    /**
+     * NEW: Get the role of the employee linked to a payroll
+     * Returns the role from users table for the payroll's employee
+     */
+    public function getEmployeeRoleFromPayroll($payroll)
+    {
+        $employeeUser = self::where('employee_id', $payroll->employee_id)->first();
+        return $employeeUser->role ?? 'Employee';
+    }
+
+    /**
+     * NEW: Check if HR can process this specific employee's payroll
+     */
+    public function hrCanProcess($payroll)
+    {
+        if (!$this->isHR()) {
+            return false;
+        }
+        
+        $employeeRole = $this->getEmployeeRoleFromPayroll($payroll);
+        return in_array($employeeRole, ['Employee', 'Manager']);
+    }
+
+    /**
+     * NEW: Check if Admin can process this specific employee's payroll
+     */
+    public function adminCanProcess($payroll)
+    {
+        if (!$this->isAdmin()) {
+            return false;
+        }
+        
+        $employeeRole = $this->getEmployeeRoleFromPayroll($payroll);
+        return $employeeRole === 'HR';
+    }
+
+    /**
+     * Get payroll access level for the user
+     */
+    public function getPayrollAccessLevel()
+    {
+        return match($this->role) {
+            'Admin' => 'full',
+            'HR' => 'manage',
+            'Manager' => 'team_view',
+            'Employee' => 'self_view',
+            default => 'none',
+        };
+    }
 
     // Status Methods
-    
     public function isActive()
     {
         return $this->status === 'Active';
@@ -360,12 +562,9 @@ class User extends Authenticatable
     {
         return $query->where('status', 'Inactive');
     }
-
-    // Badge Colors
     
-    /**
-     * Get user role badge color
-     */
+    // Badge Color
+
     public function getRoleBadgeColor()
     {
         $colors = [
@@ -377,9 +576,6 @@ class User extends Authenticatable
         return $colors[$this->role] ?? 'bg-secondary';
     }
 
-    /**
-     * Get user status badge color
-     */
     public function getStatusBadgeColor()
     {
         return $this->isActive() ? 'bg-success' : 'bg-danger';
